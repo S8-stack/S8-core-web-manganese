@@ -1,0 +1,6 @@
+com.s8.core.web.manganese.mail.imap.IMAPProvider
+com.s8.core.web.manganese.mail.imap.IMAPSSLProvider
+com.s8.core.web.manganese.mail.smtp.SMTPProvider
+com.s8.core.web.manganese.mail.smtp.SMTPSSLProvider
+com.s8.core.web.manganese.mail.pop3.POP3Provider
+com.s8.core.web.manganese.mail.pop3.POP3SSLProvider
