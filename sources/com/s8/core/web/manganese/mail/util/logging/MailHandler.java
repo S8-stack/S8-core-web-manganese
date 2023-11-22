@@ -43,7 +43,12 @@ package com.s8.core.web.manganese.mail.util.logging;
 
 import static com.s8.core.web.manganese.mail.util.logging.LogManagerProperties.fromLogManager;
 
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
 import java.lang.reflect.InvocationTargetException;
 import java.net.InetAddress;
 import java.net.URLConnection;
@@ -51,9 +56,20 @@ import java.net.UnknownHostException;
 import java.nio.charset.Charset;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
-import java.util.*;
-import java.util.logging.*;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Properties;
+import java.util.ResourceBundle;
+import java.util.logging.ErrorManager;
+import java.util.logging.Filter;
 import java.util.logging.Formatter;
+import java.util.logging.Handler;
+import java.util.logging.Level;
+import java.util.logging.LogRecord;
+import java.util.logging.SimpleFormatter;
 
 import com.s8.core.web.manganese.activation.DataHandler;
 import com.s8.core.web.manganese.activation.DataSource;
@@ -65,13 +81,21 @@ import com.s8.core.web.manganese.mail.BodyPart;
 import com.s8.core.web.manganese.mail.Message;
 import com.s8.core.web.manganese.mail.MessageContext;
 import com.s8.core.web.manganese.mail.MessagingException;
+import com.s8.core.web.manganese.mail.MnSender;
 import com.s8.core.web.manganese.mail.Part;
 import com.s8.core.web.manganese.mail.PasswordAuthentication;
 import com.s8.core.web.manganese.mail.SendFailedException;
 import com.s8.core.web.manganese.mail.Service;
 import com.s8.core.web.manganese.mail.Session;
 import com.s8.core.web.manganese.mail.Transport;
-import com.s8.core.web.manganese.mail.internet.*;
+import com.s8.core.web.manganese.mail.internet.AddressException;
+import com.s8.core.web.manganese.mail.internet.ContentType;
+import com.s8.core.web.manganese.mail.internet.InternetAddress;
+import com.s8.core.web.manganese.mail.internet.MimeBodyPart;
+import com.s8.core.web.manganese.mail.internet.MimeMessage;
+import com.s8.core.web.manganese.mail.internet.MimeMultipart;
+import com.s8.core.web.manganese.mail.internet.MimePart;
+import com.s8.core.web.manganese.mail.internet.MimeUtility;
 import com.s8.core.web.manganese.mail.util2.ByteArrayDataSource;
 
 /**
@@ -2759,7 +2783,7 @@ public class MailHandler extends Handler {
             envelopeFor(msg, priority);
             final Object ccl = getAndSetContextClassLoader(MAILHANDLER_LOADER);
             try {  //JDK-8025251
-                Transport.send(msg); //Calls save changes.
+                MnSender.send(msg); //Calls save changes.
             } finally {
                 getAndSetContextClassLoader(ccl);
             }
