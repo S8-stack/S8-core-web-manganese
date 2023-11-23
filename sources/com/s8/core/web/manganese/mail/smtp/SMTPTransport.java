@@ -70,7 +70,6 @@ import com.s8.core.web.manganese.mail.Message;
 import com.s8.core.web.manganese.mail.MessagingException;
 import com.s8.core.web.manganese.mail.MnTransportService;
 import com.s8.core.web.manganese.mail.SendFailedException;
-import com.s8.core.web.manganese.mail.Session;
 import com.s8.core.web.manganese.mail.auth.Ntlm;
 import com.s8.core.web.manganese.mail.event.TransportEvent;
 import com.s8.core.web.manganese.mail.internet.AddressException;
@@ -179,8 +178,8 @@ public class SMTPTransport extends MnTransportService {
 	 * @param	name	the protocol name of this transport
 	 * @param	isSSL	use SSL to connect?
 	 */
-	public SMTPTransport(Session session, SMTP_TransportProps props, SMTP_ConnectionParams params) {
-		super(session, params);
+	public SMTPTransport(SMTP_TransportProps props, SMTP_ConnectionParams params) {
+		super(params);
 		
 
 		this.props = props;
@@ -192,8 +191,7 @@ public class SMTPTransport extends MnTransportService {
 			props.useStartTLS = true;
 		}
 		
-		logger = new MailLogger(this.getClass(), "DEBUG SMTP",
-				session.getDebug(), session.getDebugOut());
+		logger = new MailLogger(this.getClass(), "DEBUG SMTP", debug, System.out);
 		traceLogger = logger.getSubLogger("protocol", null);
 		
 		
@@ -567,7 +565,7 @@ public class SMTPTransport extends MnTransportService {
 	 */
 	@Override
 	protected synchronized boolean protocolConnect() throws MessagingException {
-		Properties props = session.getProperties();
+		
 
 		// setting mail.smtp.auth to true enables attempts to use AUTH
 		boolean useAuth = this.props.auth;
@@ -727,9 +725,7 @@ public class SMTPTransport extends MnTransportService {
 			if (mechs == defaultAuthenticationMechanisms) {
 				String dprop = "mail." + "smtp" + ".auth." +
 						m.toLowerCase(Locale.ENGLISH) + ".disable";
-				boolean disabled = PropUtil.getBooleanProperty(
-						session.getProperties(),
-						dprop, !a.enabled());
+				boolean disabled = !a.enabled();
 				if (disabled) {
 					if (logger.isLoggable(Level.FINE))
 						logger.fine("mechanism " + m +
@@ -947,7 +943,7 @@ public class SMTPTransport extends MnTransportService {
 	 */
 	private class NtlmAuthenticator extends Authenticator {
 		private Ntlm ntlm;
-		private int flags;
+		private int flags = 0;
 
 		NtlmAuthenticator() {
 			super("NTLM");
@@ -958,10 +954,6 @@ public class SMTPTransport extends MnTransportService {
 				String passwd) throws MessagingException, IOException {
 			ntlm = new Ntlm(getNTLMDomain(), getLocalHost(),
 					user, passwd, logger);
-
-			flags = PropUtil.getIntProperty(
-					session.getProperties(),
-					"mail." + "smtp" + ".auth.ntlm.flags", 0);
 
 			String type1 = ntlm.generateType1Msg(flags);
 			return type1;
@@ -1034,11 +1026,13 @@ public class SMTPTransport extends MnTransportService {
 					MailLogger.class,
 					String.class
 				});
+				
+				Properties localProps2 = new Properties();
 				saslAuthenticator = (SaslAuthenticator)c.newInstance(
 						new Object[] {
 								this,
 								"smtp",
-								session.getProperties(),
+								localProps2,
 								logger,
 								serviceHost
 						});
@@ -1139,9 +1133,7 @@ public class SMTPTransport extends MnTransportService {
 		boolean use8bit = false;
 		if (message instanceof SMTPMessage)
 			use8bit = ((SMTPMessage)message).getAllow8bitMIME();
-		if (!use8bit)
-			use8bit = PropUtil.getBooleanProperty(session.getProperties(),
-					"mail." + "smtp" + ".allow8bitmime", false);
+		
 		if (logger.isLoggable(Level.FINE))
 			logger.fine("use8bit " + use8bit);
 		if (use8bit && supportsExtension("8BITMIME")) {
@@ -1235,6 +1227,13 @@ public class SMTPTransport extends MnTransportService {
 		}
 		sendMessageEnd();
 	}
+
+	private void notifyTransportListeners(int messageDelivered, String[] validSentAddr2, String[] validUnsentAddr2,
+			String[] invalidAddr2, MimeMessage message2) {
+		System.out.println("notifyTransportListeners > "+messageDelivered);
+	}
+	
+	
 
 	/**
 	 * The send failed, fix the address arrays to report the failure correctly.
@@ -1351,23 +1350,7 @@ public class SMTPTransport extends MnTransportService {
 		}
 	}
 
-	/**
-	 * Notify all TransportListeners.  Keep track of whether notification
-	 * has been done so as to only notify once per send.
-	 *
-	 * @since	JavaMail 1.4.2
-	 */
-	@Override
-	protected void notifyTransportListeners(int type, String[] validSent,
-			String[] validUnsent,
-			String[] invalid, Message msg) {
-
-		if (!notificationDone) {
-			super.notifyTransportListeners(type, validSent, validUnsent,
-					invalid, msg);
-			notificationDone = true;
-		}
-	}
+	
 
 	
 
@@ -1569,16 +1552,13 @@ public class SMTPTransport extends MnTransportService {
 		String from = null;
 		if (message instanceof SMTPMessage)
 			from = ((SMTPMessage)message).getEnvelopeFrom();
-		if (from == null || from.length() <= 0)
-			from = session.getProperty("mail." + "smtp" + ".from");
 		if (from == null || from.length() <= 0) {
 			Address[] fa;
-			Address me;
+			Address me = null;
 			if (message != null && (fa = message.getFrom()) != null &&
 					fa.length > 0)
 				me = fa[0];
-			else
-				me = InternetAddress.getLocalAddress(session);
+		
 
 			if (me != null)
 				from = ((InternetAddress)me).getAddress();
@@ -1597,8 +1577,6 @@ public class SMTPTransport extends MnTransportService {
 			String ret = null;
 			if (message instanceof SMTPMessage)
 				ret = ((SMTPMessage)message).getDSNRet();
-			if (ret == null)
-				ret = session.getProperty("mail.smtp.dsn.ret");
 			// XXX - check for legal syntax?
 			if (ret != null)
 				cmd += " RET=" + ret;
@@ -1613,8 +1591,6 @@ public class SMTPTransport extends MnTransportService {
 			String submitter = null;
 			if (message instanceof SMTPMessage)
 				submitter = ((SMTPMessage)message).getSubmitter();
-			if (submitter == null)
-				submitter = session.getProperty("mail.smtp.submitter");
 			// XXX - check for legal syntax?
 			if (submitter != null) {
 				try {
@@ -1635,8 +1611,7 @@ public class SMTPTransport extends MnTransportService {
 		String ext = null;
 		if (message instanceof SMTPMessage)
 			ext = ((SMTPMessage)message).getMailExtension();
-		if (ext == null)
-			ext = session.getProperty("mail.smtp.mailextension");
+	
 		if (ext != null && ext.length() > 0)
 			cmd += " " + ext;
 
@@ -1696,9 +1671,6 @@ public class SMTPTransport extends MnTransportService {
 		boolean sendPartial = false;
 		if (message instanceof SMTPMessage)
 			sendPartial = ((SMTPMessage)message).getSendPartial();
-		if (!sendPartial)
-			sendPartial = PropUtil.getBooleanProperty(session.getProperties(),
-					"mail.props.sendpartial", false);
 		if (sendPartial)
 			logger.fine("sendPartial set");
 
@@ -1707,8 +1679,6 @@ public class SMTPTransport extends MnTransportService {
 		if (supportsExtension("DSN")) {
 			if (message instanceof SMTPMessage)
 				notify = ((SMTPMessage)message).getDSNNotify();
-			if (notify == null)
-				notify = session.getProperty("mail.props.dsn.notify");
 			// XXX - check for legal syntax?
 			if (notify != null)
 				dsn = true;
@@ -1968,7 +1938,8 @@ public class SMTPTransport extends MnTransportService {
 		issueCommand("STARTTLS", 220);
 		// it worked, now switch the socket into TLS mode
 		try {
-			serverSocket = SocketFetcher.startTLS(serverSocket, host, session.getProperties(), "mail.smtp");
+			Properties localProps2 = new Properties();
+			serverSocket = SocketFetcher.startTLS(serverSocket, host, localProps2, "mail.smtp");
 			initStreams();
 		} catch (IOException ioex) {
 			closeConnection();
@@ -1990,9 +1961,8 @@ public class SMTPTransport extends MnTransportService {
 					"\", port " + port + ", isSSL " + isSSL);
 
 		try {
-			Properties props = session.getProperties();
-
-			serverSocket = SocketFetcher.getSocket(host, port, props, "mail.smtp", isSSL);
+			Properties localProps2 = new Properties();
+			serverSocket = SocketFetcher.getSocket(host, port, localProps2, "mail.smtp", isSSL);
 
 			// socket factory may've chosen a different port,
 			// update it for the debug messages that follow
@@ -2077,7 +2047,8 @@ public class SMTPTransport extends MnTransportService {
 
 
 	private void initStreams() throws IOException {
-		boolean quote = PropUtil.getBooleanProperty(session.getProperties(),
+		Properties localProps2 = new Properties();
+		boolean quote = PropUtil.getBooleanProperty(localProps2,
 				"mail.debug.quote", false);
 
 		traceInput =

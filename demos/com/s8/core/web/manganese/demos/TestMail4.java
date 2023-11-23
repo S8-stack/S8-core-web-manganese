@@ -167,7 +167,7 @@ public class TestMail4 {
 	        
 	        SMTP_TransportProps props = new SMTP_TransportProps();
 	        
-	        SMTPTransport transport = new SMTPTransport(session, props, params);
+	        SMTPTransport transport = new SMTPTransport(props, params);
 	        
 	        transport.connect();
 	        

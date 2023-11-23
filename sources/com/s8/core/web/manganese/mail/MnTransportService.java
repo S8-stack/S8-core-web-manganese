@@ -42,7 +42,6 @@ package com.s8.core.web.manganese.mail;
 
 import java.util.Vector;
 
-import com.s8.core.web.manganese.mail.event.TransportEvent;
 import com.s8.core.web.manganese.mail.event.TransportListener;
 import com.s8.core.web.manganese.mail.smtp.SMTP_ConnectionParams;
 
@@ -71,8 +70,8 @@ public abstract class MnTransportService extends MnService {
 	 * @param	session Session object for this Transport.
 	 * @param	urlname	URLName object to be used for this Transport
 	 */
-	public MnTransportService(Session session, SMTP_ConnectionParams params) {
-		super(session, params);
+	public MnTransportService(SMTP_ConnectionParams params) {
+		super(params);
 	}
 
 
@@ -102,59 +101,5 @@ public abstract class MnTransportService extends MnService {
 	// Vector of Transport listeners
 	private volatile Vector<TransportListener> transportListeners = null;
 
-	/**
-	 * Add a listener for Transport events. <p>
-	 *
-	 * The default implementation provided here adds this listener
-	 * to an internal list of TransportListeners.
-	 *
-	 * @param l         the Listener for Transport events
-	 * @see             com.s8.core.web.manganese.mail.event.TransportEvent
-	 */
-	public synchronized void addTransportListener(TransportListener l) {
-		if (transportListeners == null)
-			transportListeners = new Vector<>();
-		transportListeners.addElement(l);
-	}
-
-	/**
-	 * Remove a listener for Transport events. <p>
-	 *
-	 * The default implementation provided here removes this listener
-	 * from the internal list of TransportListeners.
-	 *
-	 * @param l         the listener
-	 * @see             #addTransportListener
-	 */
-	public synchronized void removeTransportListener(TransportListener l) {
-		if (transportListeners != null)
-			transportListeners.removeElement(l);
-	}
-
-	/**
-	 * Notify all TransportListeners. Transport implementations are
-	 * expected to use this method to broadcast TransportEvents.<p>
-	 *
-	 * The provided default implementation queues the event into
-	 * an internal event queue. An event dispatcher thread dequeues
-	 * events from the queue and dispatches them to the registered
-	 * TransportListeners. Note that the event dispatching occurs
-	 * in a separate thread, thus avoiding potential deadlock problems.
-	 *
-	 * @param	type	the TransportEvent type
-	 * @param	validSent valid addresses to which message was sent
-	 * @param	validUnsent valid addresses to which message was not sent
-	 * @param	invalid the invalid addresses
-	 * @param	msg	the message
-	 */
-	protected void notifyTransportListeners(int type, String[] validSent,
-			String[] validUnsent,
-			String[] invalid, Message msg) {
-		if (transportListeners == null)
-			return;
-
-		TransportEvent e = new TransportEvent(this, type, validSent, 
-				validUnsent, invalid, msg);
-		queueEvent(e, transportListeners);
-	}
+	
 }

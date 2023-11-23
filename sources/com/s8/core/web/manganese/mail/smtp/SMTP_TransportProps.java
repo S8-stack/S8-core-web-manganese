@@ -1,8 +1,8 @@
 package com.s8.core.web.manganese.mail.smtp;
 
-import com.s8.core.web.manganese.mail.util.PropUtil;
+import com.s8.core.web.manganese.mail.MnTransportProps;
 
-public class SMTP_TransportProps {
+public class SMTP_TransportProps extends MnTransportProps {
 	
 	
 	public static final String UNKNOWN = "UNKNOWN";	// place holder
@@ -114,6 +114,9 @@ public class SMTP_TransportProps {
 	 */
 	public SMTP_TransportProps copy() {
 		SMTP_TransportProps props = new SMTP_TransportProps();
+		
+		
+		props.debug = debug;
 		
 		props.auth = auth;
 		props.quitWait = quitWait;
