@@ -41,7 +41,6 @@
 package com.s8.core.web.manganese.mail.smtp;
 
 import com.s8.core.web.manganese.mail.MessagingException;
-import com.s8.core.web.manganese.mail.internet.InternetAddress;
 
 /**
  * This exception is chained off a SendFailedException when the
@@ -54,7 +53,8 @@ import com.s8.core.web.manganese.mail.internet.InternetAddress;
  */
 
 public class SMTPAddressSucceededException extends MessagingException {
-    protected InternetAddress addr;	// address that succeeded
+	
+    protected String addr;	// address that succeeded
     protected String cmd;		// command issued to server
     protected int rc;			// return code from SMTP server
 
@@ -69,7 +69,7 @@ public class SMTPAddressSucceededException extends MessagingException {
      * @param rc	the SMTP return code indicating the success
      * @param err	the error string from the SMTP server
      */
-    public SMTPAddressSucceededException(InternetAddress addr,
+    public SMTPAddressSucceededException(String addr,
 				String cmd, int rc, String err) {
 	super(err);
 	this.addr = addr;
@@ -82,7 +82,7 @@ public class SMTPAddressSucceededException extends MessagingException {
      *
      * @return	the address
      */
-    public InternetAddress getAddress() {
+    public String getAddress() {
 	return addr;
     }
 

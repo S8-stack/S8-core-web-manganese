@@ -40,9 +40,7 @@
 
 package com.s8.core.web.manganese.mail.smtp;
 
-import com.s8.core.web.manganese.mail.Address;
 import com.s8.core.web.manganese.mail.SendFailedException;
-import com.s8.core.web.manganese.mail.internet.InternetAddress;
 
 /**
  * This exception is thrown when the message cannot be sent. <p>
@@ -58,7 +56,7 @@ import com.s8.core.web.manganese.mail.internet.InternetAddress;
  */
 
 public class SMTPSendFailedException extends SendFailedException {
-    protected InternetAddress addr;	// address that failed
+    protected String addr;	// address that failed
     protected String cmd;		// command issued to server
     protected int rc;			// return code from SMTP server
 
@@ -77,7 +75,7 @@ public class SMTPSendFailedException extends SendFailedException {
      * @param inv	the invalid addresses
      */
     public SMTPSendFailedException(String cmd, int rc, String err, Exception ex,
-				Address[] vs, Address[] vus, Address[] inv) {
+				String[] vs, String[] vus, String[] inv) {
 	super(err, ex, vs, vus, inv);
 	this.cmd = cmd;
 	this.rc = rc;

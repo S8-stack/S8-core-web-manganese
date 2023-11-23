@@ -40,7 +40,6 @@
 
 package com.s8.core.web.manganese.mail.event;
 
-import com.s8.core.web.manganese.mail.Address;
 import com.s8.core.web.manganese.mail.Message;
 import com.s8.core.web.manganese.mail.MnTransportService;
 
@@ -88,11 +87,14 @@ public class TransportEvent extends MailEvent {
     protected int type;
 
     /** The valid address to which the message was sent. */
-    transient protected Address[] validSent;
+    transient protected String[] validSent;
+    
     /** The valid address to which the message was not sent. */
-    transient protected Address[] validUnsent;
+    transient protected String[] validUnsent;
+    
     /** The invalid addresses. */
-    transient protected Address[] invalid;
+    transient protected String[] invalid;
+    
     /** The Message to which this event applies. */
     transient protected Message msg;
 
@@ -109,8 +111,8 @@ public class TransportEvent extends MailEvent {
      * @param	invalid	the invalid addresses
      * @param	msg	the message being sent
      */
-    public TransportEvent(MnTransportService transport, int type, Address[] validSent,
-			  Address[] validUnsent, Address[] invalid,
+    public TransportEvent(MnTransportService transport, int type, String[] validSent,
+			  String[] validUnsent, String[] invalid,
 			  Message msg) {
 	super(transport);
 	this.type = type;
@@ -132,7 +134,7 @@ public class TransportEvent extends MailEvent {
      * Return the addresses to which this message was sent succesfully.
      * @return Addresses to which the message was sent successfully or null
      */
-    public Address[] getValidSentAddresses() {
+    public String[] getValidSentAddresses() {
 	return validSent;
     }
 
@@ -142,7 +144,7 @@ public class TransportEvent extends MailEvent {
      * @return Addresses that are valid but to which the message was 
      *         not sent successfully or null
      */
-    public Address[] getValidUnsentAddresses() {
+    public String[] getValidUnsentAddresses() {
 	return validUnsent;
     }
 
@@ -150,7 +152,7 @@ public class TransportEvent extends MailEvent {
      * Return the addresses to which this message could not be sent.
      * @return Addresses to which the message sending failed or null
      */
-    public Address[] getInvalidAddresses() {
+    public String[] getInvalidAddresses() {
 	return invalid;
     }
 

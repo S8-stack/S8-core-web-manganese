@@ -69,9 +69,9 @@ import com.s8.core.web.manganese.mail.Address;
 import com.s8.core.web.manganese.mail.AuthenticationFailedException;
 import com.s8.core.web.manganese.mail.Message;
 import com.s8.core.web.manganese.mail.MessagingException;
+import com.s8.core.web.manganese.mail.MnTransportService;
 import com.s8.core.web.manganese.mail.SendFailedException;
 import com.s8.core.web.manganese.mail.Session;
-import com.s8.core.web.manganese.mail.MnTransportService;
 import com.s8.core.web.manganese.mail.URLName;
 import com.s8.core.web.manganese.mail.auth.Ntlm;
 import com.s8.core.web.manganese.mail.event.TransportEvent;
@@ -80,7 +80,6 @@ import com.s8.core.web.manganese.mail.internet.InternetAddress;
 import com.s8.core.web.manganese.mail.internet.MimeMessage;
 import com.s8.core.web.manganese.mail.internet.MimeMultipart;
 import com.s8.core.web.manganese.mail.internet.MimePart;
-import com.s8.core.web.manganese.mail.internet.ParseException;
 import com.s8.core.web.manganese.mail.util.ASCIIUtility;
 import com.s8.core.web.manganese.mail.util.BASE64EncoderStream;
 import com.s8.core.web.manganese.mail.util.LineInputStream;
@@ -133,9 +132,9 @@ public class SMTPTransport extends MnTransportService {
 
 	// Following fields valid only during the sendMessage method.
 	private MimeMessage message;	// Message to be sent
-	private Address[] addresses;	// Addresses to which to send the msg
+	private String[] addresses;	// Addresses to which to send the msg
 	// Valid sent, valid unsent and invalid addresses
-	private Address[] validSentAddr, validUnsentAddr, invalidAddr;
+	private String[] validSentAddr, validUnsentAddr, invalidAddr;
 	// Did we send the message even though some addresses were invalid?
 	private boolean sendPartiallyFailed = false;
 	// If so, here's an exception we need to throw
@@ -1277,8 +1276,7 @@ public class SMTPTransport extends MnTransportService {
 	 *                  or not in the connected state or if the message is
 	 *                  not a MimeMessage.
 	 */
-	@Override
-	public synchronized void sendMessage(Message message, Address[] addresses)
+	public synchronized void sendMessage(Message message, String[] addresses)
 			throws MessagingException, SendFailedException {
 
 		sendMessageStart(message != null ? message.getSubject() : "");
@@ -1290,20 +1288,14 @@ public class SMTPTransport extends MnTransportService {
 			logger.fine("Can only send RFC822 msgs");
 			throw new MessagingException("SMTP can only send RFC822 messages");
 		}
-		for (int i = 0; i < addresses.length; i++) {
-			if (!(addresses[i] instanceof InternetAddress)) {
-				throw new MessagingException(addresses[i] +
-						" is not an InternetAddress");
-			}
-		}
+		
 		if (addresses.length == 0)
 			throw new SendFailedException("No recipient addresses");
 
 		this.message = (MimeMessage)message;
 		this.addresses = addresses;
 		validUnsentAddr = addresses;	// until we know better
-		expandGroups();
-
+	
 		boolean use8bit = false;
 		if (message instanceof SMTPMessage)
 			use8bit = ((SMTPMessage)message).getAllow8bitMIME();
@@ -1410,8 +1402,8 @@ public class SMTPTransport extends MnTransportService {
 	private void addressesFailed() {
 		if (validSentAddr != null) {
 			if (validUnsentAddr != null) {
-				Address newa[] =
-						new Address[validSentAddr.length + validUnsentAddr.length];
+				String newa[] =
+						new String[validSentAddr.length + validUnsentAddr.length];
 				System.arraycopy(validSentAddr, 0,
 						newa, 0, validSentAddr.length);
 				System.arraycopy(validUnsentAddr, 0,
@@ -1526,9 +1518,9 @@ public class SMTPTransport extends MnTransportService {
 	 * @since	JavaMail 1.4.2
 	 */
 	@Override
-	protected void notifyTransportListeners(int type, Address[] validSent,
-			Address[] validUnsent,
-			Address[] invalid, Message msg) {
+	protected void notifyTransportListeners(int type, String[] validSent,
+			String[] validUnsent,
+			String[] invalid, Message msg) {
 
 		if (!notificationDone) {
 			super.notifyTransportListeners(type, validSent, validUnsent,
@@ -1537,46 +1529,7 @@ public class SMTPTransport extends MnTransportService {
 		}
 	}
 
-	/**
-	 * Expand any group addresses.
-	 */
-	private void expandGroups() {
-		List<Address> groups = null;
-		for (int i = 0; i < addresses.length; i++) {
-			InternetAddress a = (InternetAddress)addresses[i];
-			if (a.isGroup()) {
-				if (groups == null) {
-					// first group, catch up with where we are
-					groups = new ArrayList<>();
-					for (int k = 0; k < i; k++)
-						groups.add(addresses[k]);
-				}
-				// parse it and add each individual address
-				try {
-					InternetAddress[] ia = a.getGroup(true);
-					if (ia != null) {
-						for (int j = 0; j < ia.length; j++)
-							groups.add(ia[j]);
-					} else
-						groups.add(a);
-				} catch (ParseException pex) {
-					// parse failed, add the whole thing
-					groups.add(a);
-				}
-			} else {
-				// if we've started accumulating a list, add this to it
-				if (groups != null)
-					groups.add(a);
-			}
-		}
-
-		// if we have a new list, convert it back to an array
-		if (groups != null) {
-			InternetAddress[] newa = new InternetAddress[groups.size()];
-			groups.toArray(newa);
-			addresses = newa;
-		}
-	}
+	
 
 	/**
 	 * If the Part is a text part and has a Content-Transfer-Encoding
@@ -1892,9 +1845,9 @@ public class SMTPTransport extends MnTransportService {
 	 * valid addr: 552 (quota), 450, 451, 452 (quota), 421 (srvr abort)
 	 */
 	protected void rcptTo() throws MessagingException {
-		List<InternetAddress> valid = new ArrayList<>();
-		List<InternetAddress> validUnsent = new ArrayList<>();
-		List<InternetAddress> invalid = new ArrayList<>();
+		List<String> valid = new ArrayList<>();
+		List<String> validUnsent = new ArrayList<>();
+		List<String> invalid = new ArrayList<>();
 		int retCode = -1;
 		MessagingException mex = null;
 		boolean sendFailed = false;
@@ -1925,8 +1878,8 @@ public class SMTPTransport extends MnTransportService {
 		for (int i = 0; i < addresses.length; i++) {
 
 			sfex = null;
-			InternetAddress ia = (InternetAddress)addresses[i];
-			String cmd = "RCPT TO:" + normalizeAddress(ia.getAddress());
+			String ia = addresses[i];
+			String cmd = "RCPT TO:" + normalizeAddress(ia);
 			if (dsn)
 				cmd += " NOTIFY=" + notify;
 			// send the addresses to the SMTP server
@@ -2022,16 +1975,16 @@ public class SMTPTransport extends MnTransportService {
 		// copy the lists into appropriate arrays
 		if (sendFailed) {
 			// copy invalid addrs
-			invalidAddr = new Address[invalid.size()];
+			invalidAddr = new String[invalid.size()];
 			invalid.toArray(invalidAddr);
 
 			// copy all valid addresses to validUnsent, since something failed
-			validUnsentAddr = new Address[valid.size() + validUnsent.size()];
+			validUnsentAddr = new String[valid.size() + validUnsent.size()];
 			int i = 0;
 			for (int j = 0; j < valid.size(); j++)
-				validUnsentAddr[i++] = (Address)valid.get(j);
+				validUnsentAddr[i++] = valid.get(j);
 			for (int j = 0; j < validUnsent.size(); j++)
-				validUnsentAddr[i++] = (Address)validUnsent.get(j);
+				validUnsentAddr[i++] = validUnsent.get(j);
 		} else if (reportSuccess || (sendPartial &&
 				(invalid.size() > 0 || validUnsent.size() > 0))) {
 			// we'll go on to send the message, but after sending we'll
@@ -2040,15 +1993,15 @@ public class SMTPTransport extends MnTransportService {
 			exception = mex;
 
 			// copy invalid addrs
-			invalidAddr = new Address[invalid.size()];
+			invalidAddr = new String[invalid.size()];
 			invalid.toArray(invalidAddr);
 
 			// copy valid unsent addresses to validUnsent
-			validUnsentAddr = new Address[validUnsent.size()];
+			validUnsentAddr = new String[validUnsent.size()];
 			validUnsent.toArray(validUnsentAddr);
 
 			// copy valid addresses to validSent
-			validSentAddr = new Address[valid.size()];
+			validSentAddr = new String[valid.size()];
 			valid.toArray(validSentAddr);
 		} else {        // all addresses pass
 			validSentAddr = addresses;
@@ -2367,7 +2320,7 @@ public class SMTPTransport extends MnTransportService {
 			// combine valid sent & unsent addresses
 			int vsl = validSentAddr == null ? 0 : validSentAddr.length;
 			int vul = validUnsentAddr == null ? 0 : validUnsentAddr.length;
-			Address[] valid = new Address[vsl + vul];
+			String[] valid = new String[vsl + vul];
 			if (vsl > 0)
 				System.arraycopy(validSentAddr, 0, valid, 0, vsl);
 			if (vul > 0)

@@ -95,7 +95,7 @@ public abstract class MnTransportService extends MnService {
 	 * @exception MessagingException if the connection is dead or not in the 
 	 * 				connected state
 	 */
-	public abstract void sendMessage(Message msg, Address[] addresses) 
+	public abstract void sendMessage(Message msg, String[] addresses) 
 			throws MessagingException;
 
 	// Vector of Transport listeners
@@ -146,9 +146,9 @@ public abstract class MnTransportService extends MnService {
 	 * @param	invalid the invalid addresses
 	 * @param	msg	the message
 	 */
-	protected void notifyTransportListeners(int type, Address[] validSent,
-			Address[] validUnsent,
-			Address[] invalid, Message msg) {
+	protected void notifyTransportListeners(int type, String[] validSent,
+			String[] validUnsent,
+			String[] invalid, Message msg) {
 		if (transportListeners == null)
 			return;
 

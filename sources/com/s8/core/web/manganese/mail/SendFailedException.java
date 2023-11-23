@@ -56,9 +56,9 @@ package com.s8.core.web.manganese.mail;
  */
 
 public class SendFailedException extends MessagingException {
-    transient protected Address[] invalid;
-    transient protected Address[] validSent;
-    transient protected Address[] validUnsent;
+    transient protected String[] invalid;
+    transient protected String[] validSent;
+    transient protected String[] validUnsent;
 
     private static final long serialVersionUID = -6457531621682372913L;
 
@@ -103,8 +103,8 @@ public class SendFailedException extends MessagingException {
      * @see	#getNextException
      * @see	#setNextException
      */
-    public SendFailedException(String msg, Exception ex, Address[] validSent, 
-			       Address[] validUnsent, Address[] invalid) {
+    public SendFailedException(String msg, Exception ex, String[] validSent, 
+			       String[] validUnsent, String[] invalid) {
 	super(msg, ex);
 	this.validSent = validSent;
 	this.validUnsent = validUnsent;
@@ -115,7 +115,7 @@ public class SendFailedException extends MessagingException {
      * Return the addresses to which this message was sent succesfully.
      * @return Addresses to which the message was sent successfully or null
      */
-    public Address[] getValidSentAddresses() {
+    public String[] getValidSentAddresses() {
 	return validSent;
     }
 
@@ -125,7 +125,7 @@ public class SendFailedException extends MessagingException {
      * @return Addresses that are valid but to which the message was 
      *         not sent successfully or null
      */
-    public Address[] getValidUnsentAddresses() {
+    public String[] getValidUnsentAddresses() {
 	return validUnsent;
     }
 
@@ -134,7 +134,7 @@ public class SendFailedException extends MessagingException {
      *
      * @return Addresses to which the message sending failed or null;
      */
-    public Address[] getInvalidAddresses() {
+    public String[] getInvalidAddresses() {
 	return invalid;
     }
 }
