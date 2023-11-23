@@ -12,7 +12,6 @@ import com.s8.core.web.manganese.mail.Authenticator;
 import com.s8.core.web.manganese.mail.BodyPart;
 import com.s8.core.web.manganese.mail.Message;
 import com.s8.core.web.manganese.mail.MessagingException;
-import com.s8.core.web.manganese.mail.MnProps;
 import com.s8.core.web.manganese.mail.MnSender;
 import com.s8.core.web.manganese.mail.Multipart;
 import com.s8.core.web.manganese.mail.PasswordAuthentication;
@@ -23,6 +22,7 @@ import com.s8.core.web.manganese.mail.internet.MimeMessage;
 import com.s8.core.web.manganese.mail.internet.MimeMultipart;
 import com.s8.core.web.manganese.mail.smtp.SMTPTransport;
 import com.s8.core.web.manganese.mail.smtp.SMTP_ConnectionParams;
+import com.s8.core.web.manganese.mail.smtp.SMTP_TransportProps;
 
 public class TestMail4 {
 	
@@ -39,13 +39,6 @@ public class TestMail4 {
 		
 		System.out.println("TLSEmail Start");
 		
-		
-		MnProps props2 = new MnProps();
-		props2.smtp.host = "smtp.gmail.com";
-		props2.smtp.port = 587;
-		props2.smtp.auth = true;
-		props2.smtp.requireStartTLS = true;
-		props2.smtp.useStartTLS = true;
 		
 		
 		
@@ -172,8 +165,9 @@ public class TestMail4 {
 	        		Credentials.DEMO_USERNAME, 
 	        		Credentials.DEMO_PASSWORD); // correct password for gmail id
 	        
+	        SMTP_TransportProps props = new SMTP_TransportProps();
 	        
-	        SMTPTransport transport = new SMTPTransport(session, params);
+	        SMTPTransport transport = new SMTPTransport(session, props, params);
 	        
 	        transport.connect();
 	        

@@ -49,7 +49,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.StringReader;
 import java.lang.reflect.Constructor;
-import java.net.InetAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
@@ -72,7 +71,6 @@ import com.s8.core.web.manganese.mail.MessagingException;
 import com.s8.core.web.manganese.mail.MnTransportService;
 import com.s8.core.web.manganese.mail.SendFailedException;
 import com.s8.core.web.manganese.mail.Session;
-import com.s8.core.web.manganese.mail.URLName;
 import com.s8.core.web.manganese.mail.auth.Ntlm;
 import com.s8.core.web.manganese.mail.event.TransportEvent;
 import com.s8.core.web.manganese.mail.internet.AddressException;
@@ -125,8 +123,8 @@ import com.s8.core.web.manganese.mail.util.TraceOutputStream;
 
 public class SMTPTransport extends MnTransportService {
 
-	private String name = "smtp";	// Name of this protocol
-	private int defaultPort = 25;	// default SMTP port
+	private SMTP_TransportProps props;
+	
 	private boolean isSSL = false;	// use SSL?
 
 	// Following fields valid only during the sendMessage method.
@@ -148,21 +146,12 @@ public class SMTPTransport extends MnTransportService {
 	= new HashMap<>();
 	private String defaultAuthenticationMechanisms;	// set in constructor
 
-	private boolean quitWait = false;	// true if we should wait
+	
 
-	private String saslRealm = UNKNOWN;
+
 	private String authorizationID = UNKNOWN;
-	private boolean enableSASL = false;	// enable SASL authentication
-	private boolean useCanonicalHostName = false; // use canonical host name?
-	private String[] saslMechanisms = UNKNOWN_SA;
+	
 
-	private String ntlmDomain = UNKNOWN; // for ntlm authentication
-
-	private boolean reportSuccess;	// throw an exception even on success
-	private boolean useStartTLS;	// use STARTTLS command
-	private boolean requireStartTLS;	// require STARTTLS command
-	private boolean useRset;		// use RSET instead of NOOP
-	private boolean noopStrict = true;	// NOOP must return 250 for success
 
 	private MailLogger logger;		// debug logger
 	private MailLogger traceLogger;	// protocol trace logger
@@ -173,11 +162,7 @@ public class SMTPTransport extends MnTransportService {
 
 	private SaslAuthenticator saslAuthenticator; // if SASL is being used
 
-	private boolean noauthdebug = true;	// hide auth info in debug output
-	private boolean debugusername;	// include username in debug output?
-	private boolean debugpassword;	// include password in debug output?
-	private boolean allowutf8;		// allow UTF-8 usernames and passwords?
-	private int chunkSize;		// chunk size if CHUNKING supported
+	
 
 	/** Headers that should not be included when sending */
 	private static final String[] ignoreList = { "Bcc", "Content-Length" };
@@ -194,77 +179,24 @@ public class SMTPTransport extends MnTransportService {
 	 * @param	name	the protocol name of this transport
 	 * @param	isSSL	use SSL to connect?
 	 */
-	public SMTPTransport(Session session, SMTP_ConnectionParams params) {
+	public SMTPTransport(Session session, SMTP_TransportProps props, SMTP_ConnectionParams params) {
 		super(session, params);
-		Properties props = session.getProperties();
+		
 
+		this.props = props;
+		
 		this.isSSL = params.isSecured();
+		if(isSSL) {
+			props.auth = true;
+			props.requireStartTLS = true;
+			props.useStartTLS = true;
+		}
 		
 		logger = new MailLogger(this.getClass(), "DEBUG SMTP",
 				session.getDebug(), session.getDebugOut());
 		traceLogger = logger.getSubLogger("protocol", null);
-		noauthdebug = !PropUtil.getBooleanProperty(props,
-				"mail.debug.auth", false);
-		debugusername = PropUtil.getBooleanProperty(props,
-				"mail.debug.auth.username", true);
-		debugpassword = PropUtil.getBooleanProperty(props,
-				"mail.debug.auth.password", false);
 		
 		
-		if (!isSSL)
-			isSSL = PropUtil.getBooleanProperty(props,
-					"mail." + name + ".ssl.enable", false);
-		if (isSSL)
-			this.defaultPort = 465;
-		else
-			this.defaultPort = 25;
-		this.isSSL = params.isSecured();
-
-		// setting mail.smtp.quitwait to false causes us to not wait for the
-		// response from the QUIT command
-		quitWait = PropUtil.getBooleanProperty(props,
-				"mail." + name + ".quitwait", true);
-
-		// mail.smtp.reportsuccess causes us to throw an exception on success
-		reportSuccess = PropUtil.getBooleanProperty(props,
-				"mail." + name + ".reportsuccess", false);
-
-		// mail.smtp.starttls.enable enables use of STARTTLS command
-		useStartTLS = PropUtil.getBooleanProperty(props,
-				"mail." + name + ".starttls.enable", false);
-
-		// mail.smtp.starttls.required requires use of STARTTLS command
-		requireStartTLS = PropUtil.getBooleanProperty(props,
-				"mail." + name + ".starttls.required", false);
-
-		// mail.smtp.userset causes us to use RSET instead of NOOP
-		// for isConnected
-		useRset = PropUtil.getBooleanProperty(props,
-				"mail." + name + ".userset", false);
-
-		// mail.smtp.noop.strict requires 250 response to indicate success
-		noopStrict = PropUtil.getBooleanProperty(props,
-				"mail." + name + ".noop.strict", true);
-
-		// check if SASL is enabled
-		enableSASL = PropUtil.getBooleanProperty(props,
-				"mail." + name + ".sasl.enable", false);
-		if (enableSASL)
-			logger.config("enable SASL");
-		useCanonicalHostName = PropUtil.getBooleanProperty(props,
-				"mail." + name + ".sasl.usecanonicalhostname", false);
-		if (useCanonicalHostName)
-			logger.config("use canonical host name");
-
-		allowutf8 = PropUtil.getBooleanProperty(props,
-				"mail.mime.allowutf8", false);
-		if (allowutf8)
-			logger.config("allow UTF-8");
-
-		chunkSize = PropUtil.getIntProperty(props,
-				"mail." + name + ".chunksize", -1);
-		if (chunkSize > 0 && logger.isLoggable(Level.CONFIG))
-			logger.config("chunk size " + chunkSize);
 
 		// created here, because they're inner classes that reference "this"
 		Authenticator[] a = new Authenticator[] {
@@ -290,37 +222,7 @@ public class SMTPTransport extends MnTransportService {
 	 * @return	the local host name
 	 */
 	public synchronized String getLocalHost() {
-		// get our hostname and cache it for future use
-		if (localHostName == null || localHostName.length() <= 0)
-			localHostName =
-			session.getProperty("mail." + name + ".localhost");
-		if (localHostName == null || localHostName.length() <= 0)
-			localHostName =
-			session.getProperty("mail." + name + ".localaddress");
-		try {
-			if (localHostName == null || localHostName.length() <= 0) {
-				InetAddress localHost = InetAddress.getLocalHost();
-				localHostName = localHost.getCanonicalHostName();
-				// if we can't get our name, use local address literal
-				if (localHostName == null)
-					// XXX - not correct for IPv6
-					localHostName = "[" + localHost.getHostAddress() + "]";
-			}
-		} catch (UnknownHostException uhex) {
-		}
-
-		// last chance, try to get our address from our socket
-		if (localHostName == null || localHostName.length() <= 0) {
-			if (serverSocket != null && serverSocket.isBound()) {
-				InetAddress localHost = serverSocket.getLocalAddress();
-				localHostName = localHost.getCanonicalHostName();
-				// if we can't get our name, use local address literal
-				if (localHostName == null)
-					// XXX - not correct for IPv6
-					localHostName = "[" + localHost.getHostAddress() + "]";
-			}
-		}
-		return localHostName;
+		return host;
 	}
 
 	/**
@@ -356,10 +258,6 @@ public class SMTPTransport extends MnTransportService {
 	 * @since JavaMail 1.4.4
 	 */
 	public synchronized String getAuthorizationId() {
-		if (authorizationID == UNKNOWN) {
-			authorizationID =
-					session.getProperty("mail." + name + ".sasl.authorizationid");
-		}
 		return authorizationID;
 	}
 
@@ -383,7 +281,7 @@ public class SMTPTransport extends MnTransportService {
 	 * @since JavaMail 1.4.4
 	 */
 	public synchronized boolean getSASLEnabled() {
-		return enableSASL;
+		return props.enableSASL;
 	}
 
 	/**
@@ -394,7 +292,7 @@ public class SMTPTransport extends MnTransportService {
 	 * @since JavaMail 1.4.4
 	 */
 	public synchronized void setSASLEnabled(boolean enableSASL) {
-		this.enableSASL = enableSASL;
+		this.props.enableSASL = enableSASL;
 	}
 
 	/**
@@ -405,12 +303,7 @@ public class SMTPTransport extends MnTransportService {
 	 * @since JavaMail 1.3.1
 	 */
 	public synchronized String getSASLRealm() {
-		if (saslRealm == UNKNOWN) {
-			saslRealm = session.getProperty("mail." + name + ".sasl.realm");
-			if (saslRealm == null)	// try old name
-				saslRealm = session.getProperty("mail." + name + ".saslrealm");
-		}
-		return saslRealm;
+		return props.saslRealm;
 	}
 
 	/**
@@ -422,7 +315,7 @@ public class SMTPTransport extends MnTransportService {
 	 * @since JavaMail 1.3.1
 	 */
 	public synchronized void setSASLRealm(String saslRealm) {
-		this.saslRealm = saslRealm;
+		props.saslRealm = saslRealm;
 	}
 
 	/**
@@ -433,7 +326,7 @@ public class SMTPTransport extends MnTransportService {
 	 * @since JavaMail 1.5.2
 	 */
 	public synchronized boolean getUseCanonicalHostName() {
-		return useCanonicalHostName;
+		return props.useCanonicalHostName;
 	}
 
 	/**
@@ -443,9 +336,8 @@ public class SMTPTransport extends MnTransportService {
 	 *
 	 * @since JavaMail 1.5.2
 	 */
-	public synchronized void setUseCanonicalHostName(
-			boolean useCanonicalHostName) {
-		this.useCanonicalHostName = useCanonicalHostName;
+	public synchronized void setUseCanonicalHostName(boolean useCanonicalHostName) {
+		props.useCanonicalHostName = useCanonicalHostName;
 	}
 
 	/**
@@ -458,25 +350,7 @@ public class SMTPTransport extends MnTransportService {
 	 * @since JavaMail 1.4.4
 	 */
 	public synchronized String[] getSASLMechanisms() {
-		if (saslMechanisms == UNKNOWN_SA) {
-			List<String> v = new ArrayList<>(5);
-			String s = session.getProperty("mail." + name + ".sasl.mechanisms");
-			if (s != null && s.length() > 0) {
-				if (logger.isLoggable(Level.FINE))
-					logger.fine("SASL mechanisms allowed: " + s);
-				StringTokenizer st = new StringTokenizer(s, " ,");
-				while (st.hasMoreTokens()) {
-					String m = st.nextToken();
-					if (m.length() > 0)
-						v.add(m);
-				}
-			}
-			saslMechanisms = new String[v.size()];
-			v.toArray(saslMechanisms);
-		}
-		if (saslMechanisms == null)
-			return null;
-		return saslMechanisms.clone();
+		return props.saslMechanisms;
 	}
 
 	/**
@@ -489,9 +363,7 @@ public class SMTPTransport extends MnTransportService {
 	 * @since JavaMail 1.4.4
 	 */
 	public synchronized void setSASLMechanisms(String[] mechanisms) {
-		if (mechanisms != null)
-			mechanisms = mechanisms.clone();
-		this.saslMechanisms = mechanisms;
+		props.saslMechanisms = mechanisms;
 	}
 
 	/**
@@ -502,11 +374,7 @@ public class SMTPTransport extends MnTransportService {
 	 * @since JavaMail 1.4.3
 	 */
 	public synchronized String getNTLMDomain() {
-		if (ntlmDomain == UNKNOWN) {
-			ntlmDomain =
-					session.getProperty("mail." + name + ".auth.ntlm.domain");
-		}
-		return ntlmDomain;
+		return props.ntlmDomain;
 	}
 
 	/**
@@ -518,7 +386,7 @@ public class SMTPTransport extends MnTransportService {
 	 * @since JavaMail 1.4.3
 	 */
 	public synchronized void setNTLMDomain(String ntlmDomain) {
-		this.ntlmDomain = ntlmDomain;
+		props.ntlmDomain = ntlmDomain;
 	}
 
 	/**
@@ -535,7 +403,7 @@ public class SMTPTransport extends MnTransportService {
 	 * @since JavaMail 1.3.2
 	 */
 	public synchronized boolean getReportSuccess() {
-		return reportSuccess;
+		return props.reportSuccess;
 	}
 
 	/**
@@ -547,7 +415,7 @@ public class SMTPTransport extends MnTransportService {
 	 * @since JavaMail 1.3.2
 	 */
 	public synchronized void setReportSuccess(boolean reportSuccess) {
-		this.reportSuccess = reportSuccess;
+		props.reportSuccess = reportSuccess;
 	}
 
 	/**
@@ -559,7 +427,7 @@ public class SMTPTransport extends MnTransportService {
 	 * @since JavaMail 1.3.2
 	 */
 	public synchronized boolean getStartTLS() {
-		return useStartTLS;
+		return props.useStartTLS;
 	}
 
 	/**
@@ -570,7 +438,7 @@ public class SMTPTransport extends MnTransportService {
 	 * @since JavaMail 1.3.2
 	 */
 	public synchronized void setStartTLS(boolean useStartTLS) {
-		this.useStartTLS = useStartTLS;
+		props.useStartTLS = useStartTLS;
 	}
 
 	/**
@@ -581,7 +449,7 @@ public class SMTPTransport extends MnTransportService {
 	 * @since JavaMail 1.4.2
 	 */
 	public synchronized boolean getRequireStartTLS() {
-		return requireStartTLS;
+		return props.requireStartTLS;
 	}
 
 	/**
@@ -592,7 +460,7 @@ public class SMTPTransport extends MnTransportService {
 	 * @since JavaMail 1.4.2
 	 */
 	public synchronized void setRequireStartTLS(boolean requireStartTLS) {
-		this.requireStartTLS = requireStartTLS;
+		props.requireStartTLS = requireStartTLS;
 	}
 
 	/**
@@ -614,7 +482,7 @@ public class SMTPTransport extends MnTransportService {
 	 * @since JavaMail 1.4
 	 */
 	public synchronized boolean getUseRset() {
-		return useRset;
+		return props.useRset;
 	}
 
 	/**
@@ -626,7 +494,7 @@ public class SMTPTransport extends MnTransportService {
 	 * @since JavaMail 1.4
 	 */
 	public synchronized void setUseRset(boolean useRset) {
-		this.useRset = useRset;
+		props.useRset = useRset;
 	}
 
 	/**
@@ -638,7 +506,7 @@ public class SMTPTransport extends MnTransportService {
 	 * @since JavaMail 1.4.3
 	 */
 	public synchronized boolean getNoopStrict() {
-		return noopStrict;
+		return props.noopStrict;
 	}
 
 	/**
@@ -650,7 +518,7 @@ public class SMTPTransport extends MnTransportService {
 	 * @since JavaMail 1.4.3
 	 */
 	public synchronized void setNoopStrict(boolean noopStrict) {
-		this.noopStrict = noopStrict;
+		props.noopStrict = noopStrict;
 	}
 
 	/**
@@ -702,8 +570,7 @@ public class SMTPTransport extends MnTransportService {
 		Properties props = session.getProperties();
 
 		// setting mail.smtp.auth to true enables attempts to use AUTH
-		boolean useAuth = PropUtil.getBooleanProperty(props,
-				"mail." + name + ".auth", false);
+		boolean useAuth = this.props.auth;
 
 		/*
 		 * If mail.smtp.auth is set, make sure we have a valid username
@@ -723,23 +590,11 @@ public class SMTPTransport extends MnTransportService {
 		}
 
 		// setting mail.smtp.ehlo to false disables attempts to use EHLO
-		boolean useEhlo =  PropUtil.getBooleanProperty(props,
-				"mail." + name + ".ehlo", true);
+		boolean useEhlo =  this.props.useEhlo;
 		if (logger.isLoggable(Level.FINE))
 			logger.fine("useEhlo " + useEhlo + ", useAuth " + useAuth);
 
-		/*
-		 * If port is not specified, set it to value of mail.smtp.port
-		 * property if it exists, otherwise default to 25.
-		 */
-		if (port == -1)
-			port = PropUtil.getIntProperty(props,
-					"mail." + name + ".port", -1);
-		if (port == -1)
-			port = defaultPort;
-
-		if (host == null || host.length() == 0)
-			host = "localhost";
+		
 
 		/*
 		 * If anything goes wrong, we need to be sure
@@ -759,7 +614,7 @@ public class SMTPTransport extends MnTransportService {
 			if (!succeed)
 				helo(getLocalHost());
 
-			if (useStartTLS || requireStartTLS) {
+			if (this.props.useStartTLS || this.props.requireStartTLS) {
 				if (serverSocket instanceof SSLSocket) {
 					logger.fine("STARTTLS requested but already using SSL");
 				} else if (supportsExtension("STARTTLS")) {
@@ -771,7 +626,7 @@ public class SMTPTransport extends MnTransportService {
 					 * failure.
 					 */
 					ehlo(getLocalHost());
-				} else if (requireStartTLS) {
+				} else if (this.props.requireStartTLS) {
 					logger.fine("STARTTLS required but not supported");
 					throw new MessagingException(
 							"STARTTLS is required but " +
@@ -779,7 +634,7 @@ public class SMTPTransport extends MnTransportService {
 				}
 			}
 
-			if (allowutf8 && !supportsExtension("SMTPUTF8"))
+			if (this.props.allowutf8 && !supportsExtension("SMTPUTF8"))
 				logger.log(Level.INFO, "mail.mime.allowutf8 set " +
 						"but server doesn't advertise SMTPUTF8 support");
 
@@ -820,14 +675,12 @@ public class SMTPTransport extends MnTransportService {
 		// setting mail.smtp.auth.mechanisms controls which mechanisms will
 		// be used, and in what order they'll be considered.  only the first
 		// match is used.
-		String mechs = session.getProperty("mail." + name + ".auth.mechanisms");
-		if (mechs == null)
-			mechs = defaultAuthenticationMechanisms;
+		String mechs = defaultAuthenticationMechanisms;
 
 		String authzid = getAuthorizationId();
 		if (authzid == null)
 			authzid = user;
-		if (enableSASL) {
+		if (this.props.enableSASL) {
 			logger.fine("Authenticate with SASL");
 			try {
 				if (sasllogin(getSASLMechanisms(), getSASLRealm(), authzid,
@@ -872,7 +725,7 @@ public class SMTPTransport extends MnTransportService {
 			 * If using the default mechanisms, check if this one is disabled.
 			 */
 			if (mechs == defaultAuthenticationMechanisms) {
-				String dprop = "mail." + name + ".auth." +
+				String dprop = "mail." + "smtp" + ".auth." +
 						m.toLowerCase(Locale.ENGLISH) + ".disable";
 				boolean disabled = PropUtil.getBooleanProperty(
 						session.getProperties(),
@@ -931,7 +784,7 @@ public class SMTPTransport extends MnTransportService {
 			try {
 				// use "initial response" capability, if supported
 				String ir = getInitialResponse(host, authzid, user, passwd);
-				if (noauthdebug && isTracing()) {
+				if (props.noauthdebug && isTracing()) {
 					logger.fine("AUTH " + mech + " command trace suppressed");
 					suspendTracing();
 				}
@@ -960,7 +813,7 @@ public class SMTPTransport extends MnTransportService {
 				logger.log(Level.FINE, "AUTH " + mech + " failed", t);
 				thrown = t;
 			} finally {
-				if (noauthdebug && isTracing())
+				if (props.noauthdebug && isTracing())
 					logger.fine("AUTH " + mech + " " +
 							(resp == 235 ? "succeeded" : "failed"));
 				resumeTracing();
@@ -1108,7 +961,7 @@ public class SMTPTransport extends MnTransportService {
 
 			flags = PropUtil.getIntProperty(
 					session.getProperties(),
-					"mail." + name + ".auth.ntlm.flags", 0);
+					"mail." + "smtp" + ".auth.ntlm.flags", 0);
 
 			String type1 = ntlm.generateType1Msg(flags);
 			return type1;
@@ -1166,7 +1019,7 @@ public class SMTPTransport extends MnTransportService {
 	private boolean sasllogin(String[] allowed, String realm, String authzid,
 			String u, String p) throws MessagingException {
 		String serviceHost;
-		if (useCanonicalHostName)
+		if (props.useCanonicalHostName)
 			serviceHost = serverSocket.getInetAddress().getCanonicalHostName();
 		else
 			serviceHost = host;
@@ -1184,7 +1037,7 @@ public class SMTPTransport extends MnTransportService {
 				saslAuthenticator = (SaslAuthenticator)c.newInstance(
 						new Object[] {
 								this,
-								name,
+								"smtp",
 								session.getProperties(),
 								logger,
 								serviceHost
@@ -1218,7 +1071,7 @@ public class SMTPTransport extends MnTransportService {
 		}
 		String[] mechs = v.toArray(new String[v.size()]);
 		try {
-			if (noauthdebug && isTracing()) {
+			if (props.noauthdebug && isTracing()) {
 				logger.fine("SASL AUTH command trace suppressed");
 				suspendTracing();
 			}
@@ -1288,7 +1141,7 @@ public class SMTPTransport extends MnTransportService {
 			use8bit = ((SMTPMessage)message).getAllow8bitMIME();
 		if (!use8bit)
 			use8bit = PropUtil.getBooleanProperty(session.getProperties(),
-					"mail." + name + ".allow8bitmime", false);
+					"mail." + "smtp" + ".allow8bitmime", false);
 		if (logger.isLoggable(Level.FINE))
 			logger.fine("use8bit " + use8bit);
 		if (use8bit && supportsExtension("8BITMIME")) {
@@ -1306,7 +1159,7 @@ public class SMTPTransport extends MnTransportService {
 		try {
 			mailFrom();
 			rcptTo();
-			if (chunkSize > 0 && supportsExtension("CHUNKING")) {
+			if (props.chunkSize > 0 && supportsExtension("CHUNKING")) {
 				/*
 				 * Use BDAT to send the data in chunks.
 				 * Note that even though the BDAT command is able to send
@@ -1414,7 +1267,7 @@ public class SMTPTransport extends MnTransportService {
 		try {
 			if (serverSocket != null) {
 				sendCommand("QUIT");
-				if (quitWait) {
+				if (props.quitWait) {
 					int resp = readServerResponse();
 					if (resp != 221 && resp != -1 &&
 							logger.isLoggable(Level.FINE))
@@ -1455,7 +1308,7 @@ public class SMTPTransport extends MnTransportService {
 		try {
 			// sendmail may respond slowly to NOOP after many requests
 			// so if mail.smtp.userset is set we use RSET instead of NOOP.
-			if (useRset)
+			if (props.useRset)
 				sendCommand("RSET");
 			else
 				sendCommand("NOOP");
@@ -1478,7 +1331,7 @@ public class SMTPTransport extends MnTransportService {
 			 * If mail.smtp.noop.strict is set to false, be tolerant of
 			 * servers that return the wrong response code for success.
 			 */
-			if (resp >= 0 && (noopStrict ? resp == 250 : resp != 421)) {
+			if (resp >= 0 && (props.noopStrict ? resp == 250 : resp != 421)) {
 				return true;
 			} else {
 				try {
@@ -1717,7 +1570,7 @@ public class SMTPTransport extends MnTransportService {
 		if (message instanceof SMTPMessage)
 			from = ((SMTPMessage)message).getEnvelopeFrom();
 		if (from == null || from.length() <= 0)
-			from = session.getProperty("mail." + name + ".from");
+			from = session.getProperty("mail." + "smtp" + ".from");
 		if (from == null || from.length() <= 0) {
 			Address[] fa;
 			Address me;
@@ -1736,7 +1589,7 @@ public class SMTPTransport extends MnTransportService {
 
 		String cmd = "MAIL FROM:" + normalizeAddress(from);
 
-		if (allowutf8 && supportsExtension("SMTPUTF8"))
+		if (props.allowutf8 && supportsExtension("SMTPUTF8"))
 			cmd += " SMTPUTF8";
 
 		// request delivery status notification?
@@ -1745,7 +1598,7 @@ public class SMTPTransport extends MnTransportService {
 			if (message instanceof SMTPMessage)
 				ret = ((SMTPMessage)message).getDSNRet();
 			if (ret == null)
-				ret = session.getProperty("mail." + name + ".dsn.ret");
+				ret = session.getProperty("mail.smtp.dsn.ret");
 			// XXX - check for legal syntax?
 			if (ret != null)
 				cmd += " RET=" + ret;
@@ -1761,12 +1614,12 @@ public class SMTPTransport extends MnTransportService {
 			if (message instanceof SMTPMessage)
 				submitter = ((SMTPMessage)message).getSubmitter();
 			if (submitter == null)
-				submitter = session.getProperty("mail." + name + ".submitter");
+				submitter = session.getProperty("mail.smtp.submitter");
 			// XXX - check for legal syntax?
 			if (submitter != null) {
 				try {
 					String s = xtext(submitter,
-							allowutf8 && supportsExtension("SMTPUTF8"));
+							props.allowutf8 && supportsExtension("SMTPUTF8"));
 					cmd += " AUTH=" + s;
 				} catch (IllegalArgumentException ex) {
 					if (logger.isLoggable(Level.FINE))
@@ -1783,7 +1636,7 @@ public class SMTPTransport extends MnTransportService {
 		if (message instanceof SMTPMessage)
 			ext = ((SMTPMessage)message).getMailExtension();
 		if (ext == null)
-			ext = session.getProperty("mail." + name + ".mailextension");
+			ext = session.getProperty("mail.smtp.mailextension");
 		if (ext != null && ext.length() > 0)
 			cmd += " " + ext;
 
@@ -1845,7 +1698,7 @@ public class SMTPTransport extends MnTransportService {
 			sendPartial = ((SMTPMessage)message).getSendPartial();
 		if (!sendPartial)
 			sendPartial = PropUtil.getBooleanProperty(session.getProperties(),
-					"mail." + name + ".sendpartial", false);
+					"mail.props.sendpartial", false);
 		if (sendPartial)
 			logger.fine("sendPartial set");
 
@@ -1855,7 +1708,7 @@ public class SMTPTransport extends MnTransportService {
 			if (message instanceof SMTPMessage)
 				notify = ((SMTPMessage)message).getDSNNotify();
 			if (notify == null)
-				notify = session.getProperty("mail." + name + ".dsn.notify");
+				notify = session.getProperty("mail.props.dsn.notify");
 			// XXX - check for legal syntax?
 			if (notify != null)
 				dsn = true;
@@ -1876,7 +1729,7 @@ public class SMTPTransport extends MnTransportService {
 			switch (retCode) {
 			case 250: case 251:
 				valid.add(ia);
-				if (!reportSuccess)
+				if (!props.reportSuccess)
 					break;
 
 				// user wants exception even when successful, including
@@ -1972,7 +1825,7 @@ public class SMTPTransport extends MnTransportService {
 				validUnsentAddr[i++] = valid.get(j);
 			for (int j = 0; j < validUnsent.size(); j++)
 				validUnsentAddr[i++] = validUnsent.get(j);
-		} else if (reportSuccess || (sendPartial &&
+		} else if (props.reportSuccess || (sendPartial &&
 				(invalid.size() > 0 || validUnsent.size() > 0))) {
 			// we'll go on to send the message, but after sending we'll
 			// throw an exception with this exception nested
@@ -2087,7 +1940,7 @@ public class SMTPTransport extends MnTransportService {
 	 */
 	protected OutputStream bdat() throws MessagingException {
 		assert Thread.holdsLock(this);
-		dataStream = new BDATOutputStream(serverOutput, chunkSize);
+		dataStream = new BDATOutputStream(serverOutput, props.chunkSize);
 		return dataStream;
 	}
 
@@ -2115,8 +1968,7 @@ public class SMTPTransport extends MnTransportService {
 		issueCommand("STARTTLS", 220);
 		// it worked, now switch the socket into TLS mode
 		try {
-			serverSocket = SocketFetcher.startTLS(serverSocket, host,
-					session.getProperties(), "mail." + name);
+			serverSocket = SocketFetcher.startTLS(serverSocket, host, session.getProperties(), "mail.smtp");
 			initStreams();
 		} catch (IOException ioex) {
 			closeConnection();
@@ -2140,8 +1992,7 @@ public class SMTPTransport extends MnTransportService {
 		try {
 			Properties props = session.getProperties();
 
-			serverSocket = SocketFetcher.getSocket(host, port,
-					props, "mail." + name, isSSL);
+			serverSocket = SocketFetcher.getSocket(host, port, props, "mail.smtp", isSSL);
 
 			// socket factory may've chosen a different port,
 			// update it for the debug messages that follow
@@ -2621,11 +2472,11 @@ public class SMTPTransport extends MnTransportService {
 	}
 
 	private String traceUser(String user) {
-		return debugusername ? user : "<user name suppressed>";
+		return props.debugusername ? user : "<user name suppressed>";
 	}
 
 	private String tracePassword(String password) {
-		return debugpassword ? password :
+		return props.debugpassword ? password :
 			(password == null ? "<null>" : "<non-null>");
 	}
 
@@ -2634,7 +2485,7 @@ public class SMTPTransport extends MnTransportService {
 	 * depending on allowutf8.
 	 */
 	private byte[] toBytes(String s) {
-		if (allowutf8)
+		if (props.allowutf8)
 			return s.getBytes(StandardCharsets.UTF_8);
 		else
 			// don't use StandardCharsets.US_ASCII because it rejects non-ASCII
