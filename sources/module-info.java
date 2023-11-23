@@ -13,7 +13,7 @@ module com.s8.core.web.manganese {
 	exports com.s8.core.web.manganese.mail;
 	exports com.s8.core.web.manganese.mail.smtp;
 	exports com.s8.core.web.manganese.mail.internet;
-	exports com.s8.core.web.manganese.mail.search;
+	
 	
 	requires java.logging;
 	requires java.desktop;
