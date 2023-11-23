@@ -43,13 +43,16 @@ package com.s8.core.web.manganese.mail.auth;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.Map;
-import java.security.Provider;
-import java.security.Security;
-import javax.security.sasl.*;
+
+import javax.security.auth.callback.Callback;
+import javax.security.auth.callback.CallbackHandler;
+import javax.security.auth.callback.NameCallback;
+import javax.security.auth.callback.PasswordCallback;
+import javax.security.auth.callback.UnsupportedCallbackException;
+import javax.security.sasl.SaslClient;
+import javax.security.sasl.SaslException;
 
 import com.s8.core.web.manganese.mail.util.ASCIIUtility;
-
-import javax.security.auth.callback.*;
 
 /**
  * JavaMail SASL client for OAUTH2.

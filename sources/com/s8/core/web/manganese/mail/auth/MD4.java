@@ -44,8 +44,6 @@
 
 package com.s8.core.web.manganese.mail.auth;
 
-import java.security.*;
-
 //import static sun.security.provider.ByteArrayAccess.*;
 
 /**

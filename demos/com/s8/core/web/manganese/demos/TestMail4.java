@@ -11,7 +11,6 @@ import com.s8.core.web.manganese.critical.Credentials;
 import com.s8.core.web.manganese.mail.BodyPart;
 import com.s8.core.web.manganese.mail.Message;
 import com.s8.core.web.manganese.mail.MessagingException;
-import com.s8.core.web.manganese.mail.MnSender;
 import com.s8.core.web.manganese.mail.Multipart;
 import com.s8.core.web.manganese.mail.internet.InternetAddress;
 import com.s8.core.web.manganese.mail.internet.MimeBodyPart;
@@ -79,7 +78,7 @@ public class TestMail4 {
 
 			msg.setRecipients(Message.RecipientType.TO, InternetAddress.parse(toEmail, false));
 			System.out.println("Message is ready");
-			MnSender.send(msg);  
+			
 
 			System.out.println("EMail Sent Successfully!!");
 		}

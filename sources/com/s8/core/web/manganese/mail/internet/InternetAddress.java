@@ -41,8 +41,6 @@
 package com.s8.core.web.manganese.mail.internet;
 
 import java.io.UnsupportedEncodingException;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
@@ -50,7 +48,6 @@ import java.util.Locale;
 import java.util.StringTokenizer;
 
 import com.s8.core.web.manganese.mail.Address;
-import com.s8.core.web.manganese.mail.Session;
 import com.s8.core.web.manganese.mail.util.PropUtil;
 
 /**
@@ -609,86 +606,9 @@ public class InternetAddress extends Address implements Cloneable {
 	    return s.length() + used;
     }
 
-    /**
-     * Return an InternetAddress object representing the current user.
-     * The entire email address may be specified in the "mail.from"
-     * property.  If not set, the "mail.user" and "mail.host" properties
-     * are tried.  If those are not set, the "user.name" property and
-     * <code>InetAddress.getLocalHost</code> method are tried.
-     * Security exceptions that may occur while accessing this information
-     * are ignored.  If it is not possible to determine an email address,
-     * null is returned.
-     *
-     * @param	session		Session object used for property lookup
-     * @return			current user's email address
-     */
-    public static InternetAddress getLocalAddress(Session session) {
-	try {
-	    return _getLocalAddress(session);
-	} catch (SecurityException sex) {	// ignore it
-	} catch (AddressException ex) {		// ignore it
-	} catch (UnknownHostException ex) { }	// ignore it
-	return null;
-    }
+   
+   
 
-    /**
-     * A package-private version of getLocalAddress that doesn't swallow
-     * the exception.  Used by MimeMessage.setFrom() to report the reason
-     * for the failure.
-     */
-    // package-private
-    static InternetAddress _getLocalAddress(Session session)
-	    throws SecurityException, AddressException, UnknownHostException {
-	String user = null, host = null, address = null;
-	if (session == null) {
-	    user = System.getProperty("user.name");
-	    host = getLocalHostName();
-	} else {
-	    address = session.getProperty("mail.from");
-	    if (address == null) {
-		user = session.getProperty("mail.user");
-		if (user == null || user.length() == 0)
-		    user = session.getProperty("user.name");
-		if (user == null || user.length() == 0)
-		    user = System.getProperty("user.name");
-		host = session.getProperty("mail.host");
-		if (host == null || host.length() == 0)
-		    host = getLocalHostName();
-	    }
-	}
-
-	if (address == null && user != null && user.length() != 0 &&
-		host != null && host.length() != 0)
-	    address = MimeUtility.quote(user.trim(), specialsNoDot + "\t ") +
-							    "@" + host;
-
-	if (address == null)
-	    return null;
-
-	return new InternetAddress(address);
-    }
-
-    /**
-     * Get the local host name from InetAddress and return it in a form
-     * suitable for use in an email address.
-     */
-    private static String getLocalHostName() throws UnknownHostException {
-	String host = null;
-	InetAddress me = InetAddress.getLocalHost();
-	if (me != null) {
-	    // try canonical host name first
-	    if (useCanonicalHostName)
-		host = me.getCanonicalHostName();
-	    if (host == null)
-		host = me.getHostName();
-	    // if we can't get our name, use local address literal
-	    if (host == null)
-		host = me.getHostAddress();
-	    if (host != null && host.length() > 0 && isInetAddressLiteral(host))
-		host = '[' + host + ']';
-	}
-	return host;
-    }
 
     /**
      * Is the address an IPv4 or IPv6 address literal, which needs to
