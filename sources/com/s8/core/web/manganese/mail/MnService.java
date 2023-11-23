@@ -60,7 +60,7 @@ import com.s8.core.web.manganese.mail.event.*;
  * @author Kanwar Oberoi
  */
 
-public abstract class Service implements AutoCloseable {
+public abstract class MnService implements AutoCloseable {
 
     /**
      * The session from which this service was created.
@@ -101,7 +101,7 @@ public abstract class Service implements AutoCloseable {
      * @param	session Session object for this service
      * @param	urlname	URLName object to be used for this service
      */
-    protected Service(Session session, URLName urlname) {
+    protected MnService(Session session, URLName urlname) {
 	this.session = session;
 	debug = session.getDebug();
 	url = urlname;

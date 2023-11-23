@@ -56,7 +56,7 @@ package com.s8.core.web.manganese.mail;
  */
 
 public class StoreClosedException extends MessagingException {
-    transient private Store store;
+    transient private MnStoreService store;
 
     private static final long serialVersionUID = -3145392336120082655L;
 
@@ -65,7 +65,7 @@ public class StoreClosedException extends MessagingException {
      *
      * @param store	The dead Store object
      */
-    public StoreClosedException(Store store) {
+    public StoreClosedException(MnStoreService store) {
 	this(store, null);
     }
 
@@ -76,7 +76,7 @@ public class StoreClosedException extends MessagingException {
      * @param store	The dead Store object
      * @param message	The detailed error message
      */
-    public StoreClosedException(Store store, String message) {
+    public StoreClosedException(MnStoreService store, String message) {
 	super(message);
 	this.store = store;
     }
@@ -91,7 +91,7 @@ public class StoreClosedException extends MessagingException {
      * @param e		The embedded exception
      * @since		JavaMail 1.5
      */
-    public StoreClosedException(Store store, String message, Exception e) {
+    public StoreClosedException(MnStoreService store, String message, Exception e) {
 	super(message, e);
 	this.store = store;
     }
@@ -101,7 +101,7 @@ public class StoreClosedException extends MessagingException {
      *
      * @return	the dead Store object
      */
-    public Store getStore() {
+    public MnStoreService getStore() {
 	return store;
     }
 }

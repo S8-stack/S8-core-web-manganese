@@ -47,8 +47,8 @@ package com.s8.core.web.manganese.mail;
  * sent as well as the valid addresses to which the message was sent and
  * valid addresses to which the message was not sent.
  *
- * @see	com.s8.core.web.manganese.mail.Transport#send
- * @see	com.s8.core.web.manganese.mail.Transport#sendMessage
+ * @see	com.s8.core.web.manganese.mail.MnTransportService#send
+ * @see	com.s8.core.web.manganese.mail.MnTransportService#sendMessage
  * @see	com.s8.core.web.manganese.mail.event.TransportEvent
  *
  * @author John Mani

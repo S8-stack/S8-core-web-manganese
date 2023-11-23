@@ -52,7 +52,7 @@ import com.s8.core.web.manganese.mail.AuthenticationFailedException;
 import com.s8.core.web.manganese.mail.Folder;
 import com.s8.core.web.manganese.mail.MessagingException;
 import com.s8.core.web.manganese.mail.Session;
-import com.s8.core.web.manganese.mail.Store;
+import com.s8.core.web.manganese.mail.MnStoreService;
 import com.s8.core.web.manganese.mail.URLName;
 import com.s8.core.web.manganese.mail.util.MailConnectException;
 import com.s8.core.web.manganese.mail.util.MailLogger;
@@ -68,7 +68,7 @@ import com.s8.core.web.manganese.mail.util.SocketConnectException;
  * @author      Bill Shannon
  * @author      John Mani
  */
-public class POP3Store extends Store {
+public class POP3Store extends MnStoreService {
 
     private String name = "pop3";		// my protocol name
     private int defaultPort = 110;		// default POP3 port

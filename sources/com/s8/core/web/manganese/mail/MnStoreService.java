@@ -58,12 +58,12 @@ import com.s8.core.web.manganese.mail.event.*;
  * @author John Mani
  * @author Bill Shannon
  *
- * @see com.s8.core.web.manganese.mail.Service
+ * @see com.s8.core.web.manganese.mail.MnService
  * @see com.s8.core.web.manganese.mail.event.ConnectionEvent
  * @see com.s8.core.web.manganese.mail.event.StoreEvent
  */
 
-public abstract class Store extends Service {
+public abstract class MnStoreService extends MnService {
 
     /**
      * Constructor.
@@ -71,7 +71,7 @@ public abstract class Store extends Service {
      * @param	session Session object for this Store.
      * @param	urlname	URLName object to be used for this Store
      */
-    protected Store(Session session, URLName urlname) {
+    protected MnStoreService(Session session, URLName urlname) {
 	super(session, urlname);
     }
 

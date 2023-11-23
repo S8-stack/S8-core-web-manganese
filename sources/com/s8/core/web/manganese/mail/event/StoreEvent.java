@@ -40,7 +40,7 @@
 
 package com.s8.core.web.manganese.mail.event;
 
-import com.s8.core.web.manganese.mail.Store;
+import com.s8.core.web.manganese.mail.MnStoreService;
 
 /**
  * This class models notifications from the Store connection. These
@@ -86,7 +86,7 @@ public class StoreEvent extends MailEvent {
      * @param	type	the event type
      * @param	message	a message assoicated with the event
      */
-    public StoreEvent(Store store, int type, String message) {
+    public StoreEvent(MnStoreService store, int type, String message) {
 	super(store);
 	this.type = type;
 	this.message = message;

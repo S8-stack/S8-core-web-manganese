@@ -61,7 +61,7 @@ import com.s8.core.web.manganese.mail.PasswordAuthentication;
 import com.s8.core.web.manganese.mail.Quota;
 import com.s8.core.web.manganese.mail.QuotaAwareStore;
 import com.s8.core.web.manganese.mail.Session;
-import com.s8.core.web.manganese.mail.Store;
+import com.s8.core.web.manganese.mail.MnStoreService;
 import com.s8.core.web.manganese.mail.StoreClosedException;
 import com.s8.core.web.manganese.mail.URLName;
 import com.s8.core.web.manganese.mail.event.StoreEvent;
@@ -178,7 +178,7 @@ import com.s8.core.web.manganese.mail.util.SocketConnectException;
  * is not used directly in this case. <p>
  */
 
-public class IMAPStore extends Store 
+public class IMAPStore extends MnStoreService 
 	     implements QuotaAwareStore, ResponseHandler {
     
     /**

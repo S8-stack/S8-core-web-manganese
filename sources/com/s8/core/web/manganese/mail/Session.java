@@ -583,7 +583,7 @@ public final class Session {
      * @exception	NoSuchProviderException If a provider for the given
      *			protocol is not found.
      */
-    public Store getStore() throws NoSuchProviderException {
+    public MnStoreService getStore() throws NoSuchProviderException {
 	return getStore(getProperty("mail.store.protocol"));
     }
 
@@ -597,7 +597,7 @@ public final class Session {
      * @exception	NoSuchProviderException If a provider for the given
      *			protocol is not found.
      */
-    public Store getStore(String protocol) throws NoSuchProviderException {
+    public MnStoreService getStore(String protocol) throws NoSuchProviderException {
 	return getStore(new URLName(protocol, null, -1, null, null, null));
     }
 
@@ -616,7 +616,7 @@ public final class Session {
      * @exception	NoSuchProviderException If a provider for the given
      *			URLName is not found.
      */
-    public Store getStore(URLName url) throws NoSuchProviderException {
+    public MnStoreService getStore(URLName url) throws NoSuchProviderException {
 	String protocol = url.getProtocol();
 	Provider p = getProvider(protocol);
 	return getStore(p, url);
@@ -631,7 +631,7 @@ public final class Session {
      * @exception	NoSuchProviderException If a provider for the given
      *			Provider is not found.
      */
-    public Store getStore(Provider provider) throws NoSuchProviderException {
+    public MnStoreService getStore(Provider provider) throws NoSuchProviderException {
 	return getStore(provider, null);
     }
 
@@ -648,7 +648,7 @@ public final class Session {
      * @exception	NoSuchProviderException If a provider for the given
      *			Provider/URLName is not found.
      */
-    private Store getStore(Provider provider, URLName url) 
+    private MnStoreService getStore(Provider provider, URLName url) 
 	throws NoSuchProviderException {
 
 	// make sure we have the correct type of provider
@@ -656,7 +656,7 @@ public final class Session {
 	    throw new NoSuchProviderException("invalid provider");
 	}
 
-	return getService(provider, url, Store.class);
+	return getService(provider, url, MnStoreService.class);
     }
 
     /**
@@ -686,7 +686,7 @@ public final class Session {
     public Folder getFolder(URLName url)
 		throws MessagingException {
 	// First get the Store
-	Store store = getStore(url);
+	MnStoreService store = getStore(url);
 	store.connect();
 	return store.getFolder(url);
     }
@@ -700,7 +700,7 @@ public final class Session {
      * @return 		a Transport object 
      * @exception	NoSuchProviderException If the provider is not found.
      */
-    public Transport getTransport() throws NoSuchProviderException {
+    public MnTransportService getTransport() throws NoSuchProviderException {
 	String prot = getProperty("mail.transport.protocol");
 	if (prot != null)
 	    return getTransport(prot);
@@ -721,7 +721,7 @@ public final class Session {
      * @exception	NoSuchProviderException If provider for the given
      *			protocol is not found.
      */
-    public Transport getTransport(String protocol)
+    public MnTransportService getTransport(String protocol)
 				throws NoSuchProviderException {
 	return getTransport(new URLName(protocol, null, -1, null, null, null));
     }
@@ -740,7 +740,7 @@ public final class Session {
      * @exception	NoSuchProviderException If a provider for the given
      *			URLName is not found.
      */
-    public Transport getTransport(URLName url) throws NoSuchProviderException {
+    public MnTransportService getTransport(URLName url) throws NoSuchProviderException {
 	String protocol = url.getProtocol();
 	Provider p = getProvider(protocol);
 	return getTransport(p, url);
@@ -755,7 +755,7 @@ public final class Session {
      * @exception	NoSuchProviderException If provider for the given
      *			provider is not found.
      */
-    public Transport getTransport(Provider provider) 
+    public MnTransportService getTransport(Provider provider) 
 	                                     throws NoSuchProviderException {
 	return getTransport(provider, null);
     }
@@ -770,7 +770,7 @@ public final class Session {
      * @exception	NoSuchProviderException If provider for the 
      *			Address type is not found
      */
-    public Transport getTransport(Address address) 
+    public MnTransportService getTransport(Address address) 
 	                                     throws NoSuchProviderException {
 
 	String transportProtocol;
@@ -795,14 +795,14 @@ public final class Session {
      *			was the wrong class.	
      */
 
-    private Transport getTransport(Provider provider, URLName url)
+    private MnTransportService getTransport(Provider provider, URLName url)
 					throws NoSuchProviderException {
 	// make sure we have the correct type of provider
 	if (provider == null || provider.getType() != Provider.Type.TRANSPORT) {
 	    throw new NoSuchProviderException("invalid provider");
 	}
 
-	return getService(provider, url, Transport.class);
+	return getService(provider, url, MnTransportService.class);
     }
 
     /**
@@ -818,7 +818,7 @@ public final class Session {
      *			(Session, URLName), or if it is not derived from
      *			Service.
      */
-    private <T extends Service> T getService(Provider provider, URLName url,
+    private <T extends MnService> T getService(Provider provider, URLName url,
 					Class<T> type)
 					throws NoSuchProviderException {
 	// need a provider and url

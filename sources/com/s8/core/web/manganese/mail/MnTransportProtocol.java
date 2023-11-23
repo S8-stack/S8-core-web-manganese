@@ -1,5 +1,7 @@
 package com.s8.core.web.manganese.mail;
 
+import com.s8.core.web.manganese.mail.smtp.SMTPSSLTransport;
+import com.s8.core.web.manganese.mail.smtp.SMTPTransport;
 
 /**
  * 
@@ -29,27 +31,30 @@ public enum MnTransportProtocol {
 	}
 
 
-	public static MnTransportProtocol get(String tag) {
+	/**
+	 * 
+	 * @param tag
+	 * @param session
+	 * @param urlname
+	 * @return
+	 * @throws NoSuchProviderException
+	 */
+	public static MnTransportService provideServiceFor(String tag, Session session, URLName urlname) 
+			throws NoSuchProviderException {
 		if(tag != null) {
 			switch(tag) {
 
 
 			case "smtp":
 			case "SMTP":
-				return SMTP;
+				return new SMTPTransport(session, urlname);
 
 			case "smtps":
 			case "SMTPS":
-				return SMTPS;
-
-
-			default : return null;
+				return new SMTPSSLTransport(session, urlname);
 
 			}	
 		}
-		else {
-			return null;
-		}
-		
+		throw new NoSuchProviderException("No provider for : " + tag);
 	}
 }

@@ -48,7 +48,7 @@ import java.util.*;
  * @author John Mani
  * @author Max Spivak
  *
- * @see com.s8.core.web.manganese.mail.Transport
+ * @see com.s8.core.web.manganese.mail.MnTransportService
  * @see com.s8.core.web.manganese.mail.event.TransportEvent
  */
 

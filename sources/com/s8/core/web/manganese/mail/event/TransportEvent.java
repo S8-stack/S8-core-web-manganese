@@ -42,7 +42,7 @@ package com.s8.core.web.manganese.mail.event;
 
 import com.s8.core.web.manganese.mail.Address;
 import com.s8.core.web.manganese.mail.Message;
-import com.s8.core.web.manganese.mail.Transport;
+import com.s8.core.web.manganese.mail.MnTransportService;
 
 /**
  * This class models Transport events.
@@ -50,7 +50,7 @@ import com.s8.core.web.manganese.mail.Transport;
  * @author John Mani
  * @author Max Spivak
  * 
- * @see com.s8.core.web.manganese.mail.Transport
+ * @see com.s8.core.web.manganese.mail.MnTransportService
  * @see com.s8.core.web.manganese.mail.event.TransportListener
  */
 
@@ -109,7 +109,7 @@ public class TransportEvent extends MailEvent {
      * @param	invalid	the invalid addresses
      * @param	msg	the message being sent
      */
-    public TransportEvent(Transport transport, int type, Address[] validSent,
+    public TransportEvent(MnTransportService transport, int type, Address[] validSent,
 			  Address[] validUnsent, Address[] invalid,
 			  Message msg) {
 	super(transport);

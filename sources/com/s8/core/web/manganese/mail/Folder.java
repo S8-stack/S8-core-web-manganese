@@ -122,7 +122,7 @@ public abstract class Folder implements AutoCloseable {
     /**
      * The parent store.
      */
-    protected Store store;
+    protected MnStoreService store;
 
     /**
      * The open mode of this folder.  The open mode is
@@ -142,7 +142,7 @@ public abstract class Folder implements AutoCloseable {
      *
      * @param store the Store that holds this folder
      */
-    protected Folder(Store store) {
+    protected Folder(MnStoreService store) {
 	this.store = store;
 
 	// create or choose the appropriate event queue
@@ -233,7 +233,7 @@ public abstract class Folder implements AutoCloseable {
      *
      * @return 		the Store
      */
-    public Store getStore() {
+    public MnStoreService getStore() {
 	return store;
     }
 

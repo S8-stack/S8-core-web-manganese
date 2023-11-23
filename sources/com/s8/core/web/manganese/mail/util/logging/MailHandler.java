@@ -85,9 +85,9 @@ import com.s8.core.web.manganese.mail.MnSender;
 import com.s8.core.web.manganese.mail.Part;
 import com.s8.core.web.manganese.mail.PasswordAuthentication;
 import com.s8.core.web.manganese.mail.SendFailedException;
-import com.s8.core.web.manganese.mail.Service;
+import com.s8.core.web.manganese.mail.MnService;
 import com.s8.core.web.manganese.mail.Session;
-import com.s8.core.web.manganese.mail.Transport;
+import com.s8.core.web.manganese.mail.MnTransportService;
 import com.s8.core.web.manganese.mail.internet.AddressException;
 import com.s8.core.web.manganese.mail.internet.ContentType;
 import com.s8.core.web.manganese.mail.internet.InternetAddress;
@@ -230,7 +230,7 @@ import com.s8.core.web.manganese.mail.util2.ByteArrayDataSource;
  *
  * <li>&lt;handler-name&gt;.mail.host the host name or IP
  * address of the email server. (defaults to <tt>null</tt>, use
- * {@linkplain Transport#protocolConnect default}
+ * {@linkplain MnTransportService#protocolConnect default}
  * <tt>Java Mail</tt> behavior)
  *
  * <li>&lt;handler-name&gt;.mail.reply.to a comma separated
@@ -3101,7 +3101,7 @@ public class MailHandler extends Handler {
             if (all == null) { //Don't pass null to sendMessage.
                 all = new InternetAddress[0];
             }
-            Transport t;
+            MnTransportService t;
             try {
                 final Address[] any = all.length != 0 ? all : abort.getFrom();
                 if (any != null && any.length != 0) {
@@ -4240,7 +4240,7 @@ public class MailHandler extends Handler {
      * @return the local host or null.
      * @since JavaMail 1.5.3
      */
-    private String getLocalHost(final Service s) {
+    private String getLocalHost(final MnService s) {
         try {
             return LogManagerProperties.getLocalHost(s);
         } catch (SecurityException | NoSuchMethodException

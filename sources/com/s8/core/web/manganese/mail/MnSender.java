@@ -148,8 +148,7 @@ public class MnSender {
 		 * protocols is a map containing the addresses
 		 * indexed by address type
 		 */
-		Map<String, List<Address>> protocols
-		= new HashMap<>();
+		Map<String, List<Address>> protocols = new HashMap<>();
 
 		// Lists of addresses
 		List<Address> invalid = new ArrayList<>();
@@ -175,7 +174,7 @@ public class MnSender {
 
 		Session s = (msg.session != null) ? msg.session :
 			Session.getDefaultInstance(System.getProperties(), null);
-		Transport transport;
+		MnTransportService transport;
 
 		/*
 		 * Optimize the case of a single protocol.

@@ -57,12 +57,12 @@ import com.s8.core.web.manganese.mail.event.TransportListener;
  * @author Max Spivak
  * @author Bill Shannon
  * 
- * @see com.s8.core.web.manganese.mail.Service
+ * @see com.s8.core.web.manganese.mail.MnService
  * @see com.s8.core.web.manganese.mail.event.ConnectionEvent
  * @see com.s8.core.web.manganese.mail.event.TransportEvent
  */
 
-public abstract class Transport extends Service {
+public abstract class MnTransportService extends MnService {
 
 	/**
 	 * Constructor.
@@ -70,7 +70,7 @@ public abstract class Transport extends Service {
 	 * @param	session Session object for this Transport.
 	 * @param	urlname	URLName object to be used for this Transport
 	 */
-	public Transport(Session session, URLName urlname) {
+	public MnTransportService(Session session, URLName urlname) {
 		super(session, urlname);
 	}
 
