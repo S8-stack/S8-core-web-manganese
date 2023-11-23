@@ -40,11 +40,10 @@
 
 package com.s8.core.web.manganese.mail;
 
+import java.io.InvalidObjectException;
+import java.io.ObjectStreamException;
+import java.io.Serializable;
 import java.util.Date;
-
-import com.s8.core.web.manganese.mail.search.SearchTerm;
-
-import java.io.*;
 
 /**
  * This class models an email message. This is an abstract class.  
@@ -657,16 +656,4 @@ public abstract class Message implements Part {
      */
     public abstract void saveChanges() throws MessagingException;
 
-    /**
-     * Apply the specified Search criterion to this message.
-     *
-     * @param term	the Search criterion
-     * @return		true if the Message matches this search
-     *			criterion, false otherwise.
-     * @exception       MessagingException for failures
-     * @see		com.s8.core.web.manganese.mail.search.SearchTerm
-     */
-    public boolean match(SearchTerm term) throws MessagingException {
-	return term.match(this);
-    }
 }

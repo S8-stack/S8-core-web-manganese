@@ -45,8 +45,6 @@ import java.text.MessageFormat;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import com.s8.core.web.manganese.mail.Session;
-
 /**
  * A simplified logger used by JavaMail to handle logging to a
  * PrintStream and logging through a java.util.logging.Logger.
@@ -139,34 +137,6 @@ public final class MailLogger {
 	this.out = out != null ? out : System.out;
     }
 
-    /**
-     * Construct a new MailLogger using the specified Logger name and
-     * debug prefix (e.g., "DEBUG").  Get the debug flag and PrintStream
-     * from the Session.
-     *
-     * @param	name	the Logger name
-     * @param	prefix	the prefix for debug output, or null for none
-     * @param	session	where to get the debug flag and PrintStream
-     */
-    @Deprecated
-    public MailLogger(String name, String prefix, Session session) {
-	this(name, prefix, session.getDebug(), session.getDebugOut());
-    }
-
-    /**
-     * Construct a new MailLogger using the specified class' package
-     * name as the Logger name and the specified
-     * debug prefix (e.g., "DEBUG").  Get the debug flag and PrintStream
-     * from the Session.
-     *
-     * @param	clazz	the Logger name is the package name of this class
-     * @param	prefix	the prefix for debug output, or null for none
-     * @param	session	where to get the debug flag and PrintStream
-     */
-    @Deprecated
-    public MailLogger(Class<?> clazz, String prefix, Session session) {
-	this(clazz, prefix, session.getDebug(), session.getDebugOut());
-    }
 
     /**
      * Create a MailLogger that uses a Logger with the specified name

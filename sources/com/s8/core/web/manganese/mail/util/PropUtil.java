@@ -40,9 +40,8 @@
 
 package com.s8.core.web.manganese.mail.util;
 
-import java.util.*;
+import java.util.Properties;
 
-import com.s8.core.web.manganese.mail.Session;
 
 /**
  * Utilities to make it easier to get property values.
@@ -81,33 +80,6 @@ public class PropUtil {
 	return getBoolean(getProp(props, name), def);
     }
 
-    /**
-     * Get an integer valued property.
-     *
-     * @param	session	the Session
-     * @param	name	the property name
-     * @param	def	default value if property not found
-     * @return		the property value
-     */
-    @Deprecated
-    public static int getIntSessionProperty(Session session,
-				String name, int def) {
-	return getInt(getProp(session.getProperties(), name), def);
-    }
-
-    /**
-     * Get a boolean valued property.
-     *
-     * @param	session	the Session
-     * @param	name	the property name
-     * @param	def	default value if property not found
-     * @return		the property value
-     */
-    @Deprecated
-    public static boolean getBooleanSessionProperty(Session session,
-				String name, boolean def) {
-	return getBoolean(getProp(session.getProperties(), name), def);
-    }
 
     /**
      * Get a boolean valued System property.
