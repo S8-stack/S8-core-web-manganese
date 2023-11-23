@@ -46,11 +46,9 @@ import java.io.OutputStream;
 import java.net.UnknownServiceException;
 
 import com.s8.core.web.manganese.activation.DataSource;
-import com.s8.core.web.manganese.mail.FolderClosedException;
 import com.s8.core.web.manganese.mail.MessageAware;
 import com.s8.core.web.manganese.mail.MessageContext;
 import com.s8.core.web.manganese.mail.MessagingException;
-import com.s8.core.web.manganese.mail.util.FolderClosedIOException;
 
 /**
  * A utility class that implements a DataSource out of
@@ -114,9 +112,6 @@ public class MimePartDataSource implements DataSource, MessageAware {
 		return MimeUtility.decode(is, encoding);
 	    else
 		return is;
-	} catch (FolderClosedException fex) {
-	    throw new FolderClosedIOException(fex.getFolder(),
-						fex.getMessage());
 	} catch (MessagingException mex) {
 	    IOException ioex = new IOException(mex.getMessage());
 	    ioex.initCause(mex);

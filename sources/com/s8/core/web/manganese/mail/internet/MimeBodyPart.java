@@ -58,18 +58,14 @@ import com.s8.core.web.manganese.activation.DataSource;
 import com.s8.core.web.manganese.activation.FileDataSource;
 import com.s8.core.web.manganese.mail.BodyPart;
 import com.s8.core.web.manganese.mail.EncodingAware;
-import com.s8.core.web.manganese.mail.FolderClosedException;
 import com.s8.core.web.manganese.mail.Header;
 import com.s8.core.web.manganese.mail.IllegalWriteException;
 import com.s8.core.web.manganese.mail.Message;
-import com.s8.core.web.manganese.mail.MessageRemovedException;
 import com.s8.core.web.manganese.mail.MessagingException;
 import com.s8.core.web.manganese.mail.Multipart;
 import com.s8.core.web.manganese.mail.Part;
 import com.s8.core.web.manganese.mail.util.ASCIIUtility;
-import com.s8.core.web.manganese.mail.util.FolderClosedIOException;
 import com.s8.core.web.manganese.mail.util.LineOutputStream;
-import com.s8.core.web.manganese.mail.util.MessageRemovedIOException;
 import com.s8.core.web.manganese.mail.util.MimeUtil;
 import com.s8.core.web.manganese.mail.util.PropUtil;
 
@@ -703,10 +699,8 @@ public class MimeBodyPart extends BodyPart implements MimePart {
 	Object c;
 	try {
 	    c = getDataHandler().getContent();
-	} catch (FolderClosedIOException fex) {
-	    throw new FolderClosedException(fex.getFolder(), fex.getMessage());
-	} catch (MessageRemovedIOException mex) {
-	    throw new MessageRemovedException(mex.getMessage());
+	} catch (IOException fex) {
+	    throw new IOException(fex.getMessage());
 	}
 	if (cacheMultipart &&
 		(c instanceof Multipart || c instanceof Message) &&

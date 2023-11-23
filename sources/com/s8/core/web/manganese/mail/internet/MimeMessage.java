@@ -58,19 +58,14 @@ import java.util.Properties;
 import com.s8.core.web.manganese.activation.DataHandler;
 import com.s8.core.web.manganese.mail.Address;
 import com.s8.core.web.manganese.mail.Flags;
-import com.s8.core.web.manganese.mail.Folder;
-import com.s8.core.web.manganese.mail.FolderClosedException;
 import com.s8.core.web.manganese.mail.Header;
 import com.s8.core.web.manganese.mail.IllegalWriteException;
 import com.s8.core.web.manganese.mail.Message;
-import com.s8.core.web.manganese.mail.MessageRemovedException;
 import com.s8.core.web.manganese.mail.MessagingException;
 import com.s8.core.web.manganese.mail.Multipart;
 import com.s8.core.web.manganese.mail.Session;
 import com.s8.core.web.manganese.mail.util.ASCIIUtility;
-import com.s8.core.web.manganese.mail.util.FolderClosedIOException;
 import com.s8.core.web.manganese.mail.util.LineOutputStream;
-import com.s8.core.web.manganese.mail.util.MessageRemovedIOException;
 import com.s8.core.web.manganese.mail.util.MimeUtil;
 import com.s8.core.web.manganese.mail.util.PropUtil;
 import com.s8.core.web.manganese.mail.util2.SharedByteArrayInputStream;
@@ -284,61 +279,7 @@ public class MimeMessage extends Message implements MimePart {
 	}
     }
 
-    /**
-     * Constructs an empty MimeMessage object with the given Folder
-     * and message number. <p>
-     *
-     * This method is for providers subclassing <code>MimeMessage</code>.
-     *
-     * @param	folder	the Folder this message is from
-     * @param	msgnum	the number of this message
-     */
-    protected MimeMessage(Folder folder, int msgnum) {
-	super(folder, msgnum);
-	flags = new Flags();  // empty Flags object
-	saved = true;
-	initStrict();
-    }
-
-    /**
-     * Constructs a MimeMessage by reading and parsing the data from the
-     * specified MIME InputStream. The InputStream will be left positioned
-     * at the end of the data for the message. Note that the input stream
-     * parse is done within this constructor itself. <p>
-     *
-     * This method is for providers subclassing <code>MimeMessage</code>.
-     *
-     * @param folder	The containing folder.
-     * @param is	the message input stream
-     * @param msgnum	Message number of this message within its folder
-     * @exception	MessagingException for failures
-     */
-    protected MimeMessage(Folder folder, InputStream is, int msgnum)
-		throws MessagingException {
-	this(folder, msgnum);
-	initStrict();
-	parse(is);
-    }
-
-    /**
-     * Constructs a MimeMessage from the given InternetHeaders object
-     * and content.
-     *
-     * This method is for providers subclassing <code>MimeMessage</code>.
-     *
-     * @param folder	The containing folder.
-     * @param headers	The headers
-     * @param content	The message content
-     * @param msgnum	Message number of this message within its folder
-     * @exception	MessagingException for failures
-     */
-    protected MimeMessage(Folder folder, InternetHeaders headers,
-		byte[] content, int msgnum) throws MessagingException {
-	this(folder, msgnum);
-	this.headers = headers;
-	this.content = content;
-	initStrict();
-    }
+  
 
     /**
      * Set the strict flag based on property.
@@ -1527,10 +1468,8 @@ public class MimeMessage extends Message implements MimePart {
 	Object c;
 	try {
 	    c = getDataHandler().getContent();
-	} catch (FolderClosedIOException fex) {
-	    throw new FolderClosedException(fex.getFolder(), fex.getMessage());
-	} catch (MessageRemovedIOException mex) {
-	    throw new MessageRemovedException(mex.getMessage());
+	} catch (IOException fex) {
+	    throw new IOException(fex.getMessage());
 	}
 	if (MimeBodyPart.cacheMultipart &&
 		(c instanceof Multipart || c instanceof Message) &&

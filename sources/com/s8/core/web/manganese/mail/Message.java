@@ -93,10 +93,6 @@ public abstract class Message implements Part {
      */
     protected boolean expunged 	= false;
 
-    /**
-     * The containing folder, if this message is obtained from a folder
-     */
-    protected Folder folder	= null;
 
     /**
      * The Session object for this Message
@@ -108,18 +104,6 @@ public abstract class Message implements Part {
      */
     protected Message() { }
 
-    /**
-     * Constructor that takes a Folder and a message number. 
-     * Used by Folder implementations.
-     *
-     * @param	folder	containing folder
-     * @param	msgnum	this message's sequence number within this folder
-     */
-    protected Message(Folder folder, int msgnum) {
-	this.folder = folder;
-	this.msgnum = msgnum;
-	session = folder.store.session;
-    }
 
     /**
      * Constructor that takes a Session. Used for client created
@@ -623,17 +607,6 @@ public abstract class Message implements Part {
      */
     protected void setMessageNumber(int msgnum) {
 	this.msgnum = msgnum;
-    }
-
-    /**
-     * Get the folder from which this message was obtained. If
-     * this is a new message or nested message, this method returns
-     * null.
-     *
-     * @return	the containing folder
-     */
-    public Folder getFolder() {
-	return folder;
     }
 
     /**
