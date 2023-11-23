@@ -93,16 +93,7 @@ public abstract class Message implements Part {
      */
     protected boolean expunged 	= false;
 
-
-    /**
-     * The Session object for this Message
-     */
-    protected Session session	= null;
-
-    /**
-     * No-arg version of the constructor.
-     */
-    protected Message() { }
+   
 
 
     /**
@@ -111,19 +102,10 @@ public abstract class Message implements Part {
      *
      * @param	session	A Session object
      */
-    protected Message(Session session) {
-	this.session = session;
+    protected Message() {
+    	super();
     }
 
-    /**
-     * Return the Session used when this message was created.
-     *
-     * @return		the message's Session
-     * @since		JavaMail 1.5
-     */
-    public Session getSession() {
-	return session;
-    }
 
     /**
      * Returns the "From" attribute. The "From" attribute contains
@@ -142,19 +124,6 @@ public abstract class Message implements Part {
      */
     public abstract Address[] getFrom() throws MessagingException;
 
-    /**
-     * Set the "From" attribute in this Message. The value of this
-     * attribute is obtained from the property "mail.user". If this
-     * property is absent, the system property "user.name" is used.
-     *
-     * @exception	IllegalWriteException if the underlying 
-     *			implementation does not support modification 
-     *			of existing values
-     * @exception	IllegalStateException if this message is
-     *			obtained from a READ_ONLY folder.
-     * @exception       MessagingException for other failures
-     */
-    public abstract void setFrom() throws MessagingException;
 
     /**
      * Set the "From" attribute in this Message.

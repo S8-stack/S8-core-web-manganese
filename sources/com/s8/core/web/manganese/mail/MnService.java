@@ -68,7 +68,6 @@ public abstract class MnService implements AutoCloseable {
 	/**
 	 * The <code>URLName</code> of this service.
 	 */
-	protected volatile URLName	url = null;
 
 	protected String host;
 
@@ -268,51 +267,9 @@ public abstract class MnService implements AutoCloseable {
 		setConnected(false);
 	}
 
-	/**
-	 * Return a URLName representing this service.  The returned URLName
-	 * does <em>not</em> include the password field.  <p>
-	 *
-	 * Subclasses should only override this method if their
-	 * URLName does not follow the standard format. <p>
-	 *
-	 * The implementation in the Service class returns (usually a copy of)
-	 * the <code>url</code> field with the password and file information
-	 * stripped out.
-	 *
-	 * @return	the URLName representing this service
-	 * @see	URLName
-	 */
-	public URLName getURLName() {
-		URLName url = this.url;	// snapshot
-		if (url != null && (url.getPassword() != null || url.getFile() != null))
-			return new URLName(url.getProtocol(), url.getHost(),
-					url.getPort(), null /* no file */,
-					url.getUsername(), null /* no password */);
-		else
-			return url;
-	}
+	
 
-	/**
-	 * Set the URLName representing this service.
-	 * Normally used to update the <code>url</code> field
-	 * after a service has successfully connected. <p>
-	 *
-	 * Subclasses should only override this method if their
-	 * URL does not follow the standard format.  In particular,
-	 * subclasses should override this method if their URL
-	 * does not require all the possible fields supported by
-	 * <code>URLName</code>; a new <code>URLName</code> should
-	 * be constructed with any unneeded fields removed. <p>
-	 *
-	 * The implementation in the Service class simply sets the
-	 * <code>url</code> field.
-	 *
-	 * @param	url	the URLName
-	 * @see URLName
-	 */
-	protected void setURLName(URLName url) {
-		this.url = url;
-	}
+	
 
 
 	/**
@@ -321,11 +278,7 @@ public abstract class MnService implements AutoCloseable {
 	 */
 	@Override
 	public String toString() {
-		URLName url = getURLName();
-		if (url != null)
-			return url.toString();
-		else
-			return super.toString();
+		return host;
 	}
 
 
@@ -336,7 +289,7 @@ public abstract class MnService implements AutoCloseable {
 	@Override
 	protected void finalize() throws Throwable {
 		try {
-			// q.terminateQueue();
+			
 		} finally {
 			super.finalize();
 		}

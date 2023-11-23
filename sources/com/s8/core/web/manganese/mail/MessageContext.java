@@ -112,13 +112,5 @@ public class MessageContext {
 	return null;
     }
 
-    /**
-     * Return the Session we're operating in.
-     *
-     * @return	the Session, or null if not known
-     */
-    public Session getSession() {
-	Message msg = getMessage();
-	return msg != null ? msg.getSession() : null;
-    }
+  
 }

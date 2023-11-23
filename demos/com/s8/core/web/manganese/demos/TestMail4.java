@@ -8,14 +8,11 @@ import com.s8.core.web.manganese.activation.DataHandler;
 import com.s8.core.web.manganese.activation.DataSource;
 import com.s8.core.web.manganese.activation.FileDataSource;
 import com.s8.core.web.manganese.critical.Credentials;
-import com.s8.core.web.manganese.mail.Authenticator;
 import com.s8.core.web.manganese.mail.BodyPart;
 import com.s8.core.web.manganese.mail.Message;
 import com.s8.core.web.manganese.mail.MessagingException;
 import com.s8.core.web.manganese.mail.MnSender;
 import com.s8.core.web.manganese.mail.Multipart;
-import com.s8.core.web.manganese.mail.PasswordAuthentication;
-import com.s8.core.web.manganese.mail.Session;
 import com.s8.core.web.manganese.mail.internet.InternetAddress;
 import com.s8.core.web.manganese.mail.internet.MimeBodyPart;
 import com.s8.core.web.manganese.mail.internet.MimeMessage;
@@ -48,16 +45,7 @@ public class TestMail4 {
 		props.put("mail.smtp.auth", "true"); //enable authentication
 		props.put("mail.smtp.starttls.enable", "true"); //enable STARTTLS
 		
-             //create Authenticator object to pass in Session.getInstance argument
-		Authenticator auth = new Authenticator() {
-			//override the getPasswordAuthentication method
-			protected PasswordAuthentication getPasswordAuthentication() {
-				return new PasswordAuthentication(fromEmail, password);
-			}
-		};
-		Session session = Session.getInstance(props, auth);
-		
-		sendImageEmail(session, toEmail, "TLSEmail Testing Subject", "TLSEmail Testing Body");
+		sendImageEmail(toEmail, "TLSEmail Testing Subject", "TLSEmail Testing Body");
 		
 	}
 	
@@ -69,10 +57,10 @@ public class TestMail4 {
 	 * @param subject
 	 * @param body
 	 */
-	public static void sendEmail(Session session, String toEmail, String subject, String body){
+	public static void sendEmail(String toEmail, String subject, String body){
 		try
 		{
-			MimeMessage msg = new MimeMessage(session);
+			MimeMessage msg = new MimeMessage();
 			//set message headers
 			msg.addHeader("Content-type", "text/HTML; charset=UTF-8");
 			msg.addHeader("format", "flowed");
@@ -108,9 +96,9 @@ public class TestMail4 {
 	 * @param subject
 	 * @param body
 	 */
-	public static void sendImageEmail(Session session, String toEmail, String subject, String body){
+	public static void sendImageEmail(String toEmail, String subject, String body){
 		try{
-	         MimeMessage msg = new MimeMessage(session);
+	         MimeMessage msg = new MimeMessage();
 	         msg.addHeader("Content-type", "text/HTML; charset=UTF-8");
 		     msg.addHeader("format", "flowed");
 		     msg.addHeader("Content-Transfer-Encoding", "8bit");
