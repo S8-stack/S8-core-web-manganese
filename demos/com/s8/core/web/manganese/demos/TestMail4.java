@@ -17,12 +17,12 @@ import com.s8.core.web.manganese.mail.MnSender;
 import com.s8.core.web.manganese.mail.Multipart;
 import com.s8.core.web.manganese.mail.PasswordAuthentication;
 import com.s8.core.web.manganese.mail.Session;
-import com.s8.core.web.manganese.mail.URLName;
 import com.s8.core.web.manganese.mail.internet.InternetAddress;
 import com.s8.core.web.manganese.mail.internet.MimeBodyPart;
 import com.s8.core.web.manganese.mail.internet.MimeMessage;
 import com.s8.core.web.manganese.mail.internet.MimeMultipart;
 import com.s8.core.web.manganese.mail.smtp.SMTPTransport;
+import com.s8.core.web.manganese.mail.smtp.SMTP_ConnectionParams;
 
 public class TestMail4 {
 	
@@ -166,13 +166,14 @@ public class TestMail4 {
 	        //MnSender.send(msg);
 	        
 	        
-			String username = Credentials.DEMO_USERNAME; //requires valid gmail id
-			String password = Credentials.DEMO_PASSWORD; // correct password for gmail id
-	        URLName url = new URLName("smtp", Credentials.DEMO_HOST, 587, "none", username, password);
+			
+	        SMTP_ConnectionParams params = SMTP_ConnectionParams.secure(
+	        		Credentials.DEMO_HOST, 
+	        		Credentials.DEMO_USERNAME, 
+	        		Credentials.DEMO_PASSWORD); // correct password for gmail id
 	        
 	        
-	        
-	        SMTPTransport transport = new SMTPTransport(session, url);
+	        SMTPTransport transport = new SMTPTransport(session, params);
 	        
 	        transport.connect();
 	        

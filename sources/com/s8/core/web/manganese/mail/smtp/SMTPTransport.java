@@ -128,7 +128,6 @@ public class SMTPTransport extends MnTransportService {
 	private String name = "smtp";	// Name of this protocol
 	private int defaultPort = 25;	// default SMTP port
 	private boolean isSSL = false;	// use SSL?
-	private String host;		// host we're connected to
 
 	// Following fields valid only during the sendMessage method.
 	private MimeMessage message;	// Message to be sent
@@ -186,16 +185,6 @@ public class SMTPTransport extends MnTransportService {
 	private static final String UNKNOWN = "UNKNOWN";	// place holder
 	private static final String[] UNKNOWN_SA = new String[0]; // place holder
 
-	/**
-	 * Constructor that takes a Session object and a URLName
-	 * that represents a specific SMTP server.
-	 *
-	 * @param	session	the Session
-	 * @param	urlname	the URLName of this transport
-	 */
-	public SMTPTransport(Session session, URLName urlname) {
-		this(session, urlname, "smtp", false);
-	}
 
 	/**
 	 * Constructor used by this class and by SMTPSSLTransport subclass.
@@ -205,11 +194,12 @@ public class SMTPTransport extends MnTransportService {
 	 * @param	name	the protocol name of this transport
 	 * @param	isSSL	use SSL to connect?
 	 */
-	protected SMTPTransport(Session session, URLName urlname,
-			String name, boolean isSSL) {
-		super(session, urlname);
+	public SMTPTransport(Session session, SMTP_ConnectionParams params) {
+		super(session, params);
 		Properties props = session.getProperties();
 
+		this.isSSL = params.isSecured();
+		
 		logger = new MailLogger(this.getClass(), "DEBUG SMTP",
 				session.getDebug(), session.getDebugOut());
 		traceLogger = logger.getSubLogger("protocol", null);
@@ -219,9 +209,8 @@ public class SMTPTransport extends MnTransportService {
 				"mail.debug.auth.username", true);
 		debugpassword = PropUtil.getBooleanProperty(props,
 				"mail.debug.auth.password", false);
-		if (urlname != null)
-			name = urlname.getProtocol();
-		this.name = name;
+		
+		
 		if (!isSSL)
 			isSSL = PropUtil.getBooleanProperty(props,
 					"mail." + name + ".ssl.enable", false);
@@ -229,7 +218,7 @@ public class SMTPTransport extends MnTransportService {
 			this.defaultPort = 465;
 		else
 			this.defaultPort = 25;
-		this.isSSL = isSSL;
+		this.isSSL = params.isSecured();
 
 		// setting mail.smtp.quitwait to false causes us to not wait for the
 		// response from the QUIT command
@@ -709,9 +698,7 @@ public class SMTPTransport extends MnTransportService {
 	 * @exception MessagingException	for non-authentication failures
 	 */
 	@Override
-	protected synchronized boolean protocolConnect(String host, int port,
-			String user, String password)
-					throws MessagingException {
+	protected synchronized boolean protocolConnect() throws MessagingException {
 		Properties props = session.getProperties();
 
 		// setting mail.smtp.auth to true enables attempts to use AUTH
@@ -724,12 +711,12 @@ public class SMTPTransport extends MnTransportService {
 		 * because the server doesn't support ESMTP or doesn't support
 		 * the AUTH extension).
 		 */
-		if (useAuth && (user == null || password == null)) {
+		if (useAuth && (username == null || password == null)) {
 			if (logger.isLoggable(Level.FINE)) {
 				logger.fine("need username and password for authentication");
 				logger.fine("protocolConnect returning false" +
 						", host=" + host +
-						", user=" + traceUser(user) +
+						", user=" + traceUser(username) +
 						", password=" + tracePassword(password));
 			}
 			return false;
@@ -796,15 +783,15 @@ public class SMTPTransport extends MnTransportService {
 				logger.log(Level.INFO, "mail.mime.allowutf8 set " +
 						"but server doesn't advertise SMTPUTF8 support");
 
-			if ((useAuth || (user != null && password != null)) &&
+			if ((useAuth || (username != null && password != null)) &&
 					(supportsExtension("AUTH") ||
 							supportsExtension("AUTH=LOGIN"))) {
 				if (logger.isLoggable(Level.FINE))
 					logger.fine("protocolConnect login" +
 							", host=" + host +
-							", user=" + traceUser(user) +
+							", user=" + traceUser(username) +
 							", password=" + tracePassword(password));
-				connected = authenticate(user, password);
+				connected = authenticate(username, password);
 				return connected;
 			}
 

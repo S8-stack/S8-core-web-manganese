@@ -44,6 +44,7 @@ import java.util.Vector;
 
 import com.s8.core.web.manganese.mail.event.TransportEvent;
 import com.s8.core.web.manganese.mail.event.TransportListener;
+import com.s8.core.web.manganese.mail.smtp.SMTP_ConnectionParams;
 
 /**
  * An abstract class that models a message transport.
@@ -70,8 +71,8 @@ public abstract class MnTransportService extends MnService {
 	 * @param	session Session object for this Transport.
 	 * @param	urlname	URLName object to be used for this Transport
 	 */
-	public MnTransportService(Session session, URLName urlname) {
-		super(session, urlname);
+	public MnTransportService(Session session, SMTP_ConnectionParams params) {
+		super(session, params);
 	}
 
 

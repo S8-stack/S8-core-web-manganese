@@ -7,33 +7,34 @@ package com.s8.core.web.manganese.mail.smtp;
 public class SMTP_ConnectionParams {
 	
 	
-	public final static int DEFAULT_SECURE_PORT = 587;
+	public static SMTP_ConnectionParams secure(String host, String username, String password) {
+		return new SMTP_ConnectionParams(host, DEFAULT_SECURE_PORT, true, username, password);
+	}
+	
+	
 	
 	/**
 	 * 
 	 */
-	public String host = "localhost";
+	public final static int DEFAULT_SECURE_PORT = 465;
+	
+	public final static int DEFAULT_UNSECURE_PORT = 25;
 	
 	/**
-	 * connection port
+	 * 
 	 */
-	public int port = DEFAULT_SECURE_PORT;
-	
-	public boolean isSecured = true;
-	
-	public String username;
-	
-	public String password;
-
+	private final String host;
 	
 	
+	private final int port;
+	/**
+	 * is secured
+	 */
+	private boolean isSecured = true;
 	
+	private final String username;
 	
-	public SMTP_ConnectionParams() {
-		super();
-	}
-
-
+	private final String password;
 
 
 
@@ -53,6 +54,50 @@ public class SMTP_ConnectionParams {
 		this.password = password;
 	}
 	
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public String getHost() {
+		return host;
+	}
+	
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public boolean isSecured() {
+		return isSecured;
+	}
+	
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public int getPort() {
+		return port;
+	}
+	
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public String getUsername() {
+		return username;
+	}
+	
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public String getPassword() {
+		return password;
+	}
 	
 
 }

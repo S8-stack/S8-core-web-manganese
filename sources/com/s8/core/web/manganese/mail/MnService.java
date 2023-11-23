@@ -46,6 +46,7 @@ import java.util.*;
 import java.util.concurrent.Executor;
 
 import com.s8.core.web.manganese.mail.event.*;
+import com.s8.core.web.manganese.mail.smtp.SMTP_ConnectionParams;
 
 /**
  * An abstract class that contains the functionality
@@ -71,6 +72,16 @@ public abstract class MnService implements AutoCloseable {
      * The <code>URLName</code> of this service.
      */
     protected volatile URLName	url = null;
+    
+    protected String host;
+    
+    protected int port;
+    
+    protected String username;
+    
+    protected String password;
+    
+    
 
     /**
      * Debug flag for this service.  Set from the session's debug
@@ -101,10 +112,18 @@ public abstract class MnService implements AutoCloseable {
      * @param	session Session object for this service
      * @param	urlname	URLName object to be used for this service
      */
-    protected MnService(Session session, URLName urlname) {
+    protected MnService(Session session, SMTP_ConnectionParams params) {
 	this.session = session;
 	debug = session.getDebug();
-	url = urlname;
+	
+	this.host = params.getHost();
+	this.port = params.getPort();
+	this.username = params.getUsername();
+	this.password = params.getPassword();
+	
+	
+	
+	
 
 	/*
 	 * Initialize the URLName with default values.
@@ -170,103 +189,7 @@ public abstract class MnService implements AutoCloseable {
 	    q = new EventQueue(executor);
     }
 
-    /**
-     * A generic connect method that takes no parameters. Subclasses
-     * can implement the appropriate authentication schemes. Subclasses
-     * that need additional information might want to use some properties
-     * or might get it interactively using a popup window. <p>
-     *
-     * If the connection is successful, an "open" <code>ConnectionEvent</code>
-     * is delivered to any <code>ConnectionListeners</code> on this service. <p>
-     *
-     * Most clients should just call this method to connect to the service.<p>
-     *
-     * It is an error to connect to an already connected service. <p>
-     *
-     * The implementation provided here simply calls the following
-     * <code>connect(String, String, String)</code> method with nulls.
-     *
-     * @exception AuthenticationFailedException	for authentication failures
-     * @exception MessagingException	for other failures
-     * @exception IllegalStateException	if the service is already connected
-     *
-     * @see com.s8.core.web.manganese.mail.event.ConnectionEvent
-     */
-    public void connect() throws MessagingException {
-	connect(null, null, null);
-    }
-
-    /**
-     * Connect to the specified address. This method provides a simple
-     * authentication scheme that requires a username and password. <p>
-     *
-     * If the connection is successful, an "open" <code>ConnectionEvent</code>
-     * is delivered to any <code>ConnectionListeners</code> on this service. <p>
-     *
-     * It is an error to connect to an already connected service. <p>
-     *
-     * The implementation in the Service class will collect defaults
-     * for the host, user, and password from the session, from the
-     * <code>URLName</code> for this service, and from the supplied
-     * parameters and then call the <code>protocolConnect</code> method.
-     * If the <code>protocolConnect</code> method returns <code>false</code>,
-     * the user will be prompted for any missing information and the
-     * <code>protocolConnect</code> method will be called again.  The
-     * subclass should override the <code>protocolConnect</code> method.
-     * The subclass should also implement the <code>getURLName</code>
-     * method, or use the implementation in this class. <p>
-     *
-     * On a successful connection, the <code>setURLName</code> method is
-     * called with a URLName that includes the information used to make
-     * the connection, including the password. <p>
-     *
-     * If the username passed in is null, a default value will be chosen
-     * as described above.
-     *
-     * If the password passed in is null and this is the first successful
-     * connection to this service, the user name and the password
-     * collected from the user will be saved as defaults for subsequent
-     * connection attempts to this same service when using other Service object
-     * instances (the connection information is typically always saved within
-     * a particular Service object instance).  The password is saved using the
-     * Session method <code>setPasswordAuthentication</code>.  If the
-     * password passed in is not null, it is not saved, on the assumption
-     * that the application is managing passwords explicitly.
-     *
-     * @param host 	the host to connect to
-     * @param user	the user name
-     * @param password	this user's password
-     * @exception AuthenticationFailedException	for authentication failures
-     * @exception MessagingException		for other failures
-     * @exception IllegalStateException	if the service is already connected
-     * @see com.s8.core.web.manganese.mail.event.ConnectionEvent
-     * @see com.s8.core.web.manganese.mail.Session#setPasswordAuthentication
-     */
-    public void connect(String host, String user, String password)
-			throws MessagingException {
-	connect(host, -1, user, password);
-    }
-
-    /**
-     * Connect to the current host using the specified username
-     * and password.  This method is equivalent to calling the
-     * <code>connect(host, user, password)</code> method with null
-     * for the host name.
-     *
-     * @param user      the user name
-     * @param password  this user's password
-     * @exception AuthenticationFailedException for authentication failures
-     * @exception MessagingException            for other failures
-     * @exception IllegalStateException if the service is already connected
-     * @see com.s8.core.web.manganese.mail.event.ConnectionEvent
-     * @see com.s8.core.web.manganese.mail.Session#setPasswordAuthentication
-     * @see #connect(java.lang.String, java.lang.String, java.lang.String)
-     * @since           JavaMail 1.4
-     */
-    public void connect(String user, String password)
-	    throws MessagingException {
-        connect(null, user, password);
-    }
+ 
 
     /**
      * Similar to connect(host, user, password) except a specific port
@@ -282,8 +205,7 @@ public abstract class MnService implements AutoCloseable {
      * @see #connect(java.lang.String, java.lang.String, java.lang.String)
      * @see com.s8.core.web.manganese.mail.event.ConnectionEvent
      */
-    public synchronized void connect(String host, int port,
-		String user, String password) throws MessagingException {
+    public synchronized void connect() throws MessagingException {
 
 	// see if the service is already connected
 	if (isConnected())
@@ -295,120 +217,29 @@ public abstract class MnService implements AutoCloseable {
 	String protocol = null;
 	String file = null;
 
-	// get whatever information we can from the URL
-	// XXX - url should always be non-null here, Session
-	//       passes it into the constructor
-	if (url != null) {
-	    protocol = url.getProtocol();
-	    if (host == null)
-		host = url.getHost();
-	    if (port == -1)
-		port = url.getPort();
 
-	    if (user == null) {
-		user = url.getUsername();
-		if (password == null)	// get password too if we need it
-		    password = url.getPassword();
-	    } else {
-		if (password == null && user.equals(url.getUsername()))
-		    // only get the password if it matches the username
-		    password = url.getPassword();
-	    }
-
-	    file = url.getFile();
-	}
-
-	// try to get protocol-specific default properties
-	if (protocol != null) {
-	    if (host == null)
-		host = session.getProperty("mail." + protocol + ".host");
-	    if (user == null)
-		user = session.getProperty("mail." + protocol + ".user");
-	}
-
-	// try to get mail-wide default properties
-	if (host == null)
-	    host = session.getProperty("mail.host");
-
-	if (user == null)
-	    user = session.getProperty("mail.user");
-
-	// try using the system username
-	if (user == null) {
-	    try {
-		user = System.getProperty("user.name");
-	    } catch (SecurityException sex) {
-		// XXX - it's not worth creating a MailLogger just for this
-		//logger.log(Level.CONFIG, "Can't get user.name property", sex);
-	    }
-	}
-
-	// if we don't have a password, look for saved authentication info
-	if (password == null && url != null) {
-	    // canonicalize the URLName
-	    setURLName(new URLName(protocol, host, port, file, user, null));
-	    pw = session.getPasswordAuthentication(getURLName());
-	    if (pw != null) {
-		if (user == null) {
-		    user = pw.getUserName();
-		    password = pw.getPassword();
-		} else if (user.equals(pw.getUserName())) {
-		    password = pw.getPassword();
-		}
-	    } else
-		save = true;
-	}
+	
 
 	// try connecting, if the protocol needs some missing
 	// information (user, password) it will not connect.
 	// if it tries to connect and fails, remember why for later.
 	AuthenticationFailedException authEx = null;
 	try {
-	    connected = protocolConnect(host, port, user, password);
+	    connected = protocolConnect();
 	} catch (AuthenticationFailedException ex) {
 	    authEx = ex;
 	}
 
-	// if not connected, ask the user and try again
-	if (!connected) {
-	    InetAddress addr;
-	    try {
-		addr = InetAddress.getByName(host);
-	    } catch (UnknownHostException e) {
-		addr = null;
-	    }
-	    pw = session.requestPasswordAuthentication(
-			    addr, port,
-			    protocol,
-			    null, user);
-	    if (pw != null) {
-		user = pw.getUserName();
-		password = pw.getPassword();
+	
 
-		// have the service connect again
-		connected = protocolConnect(host, port, user, password);
-	    }
-	}
 
-	// if we're not connected by now, we give up
-	if (!connected) {
-	    if (authEx != null)
-		throw authEx;
-	    else if (user == null)
-		throw new AuthenticationFailedException(
-			"failed to connect, no user name specified?");
-	    else if (password == null)
-		throw new AuthenticationFailedException(
-			"failed to connect, no password specified?");
-	    else
-		throw new AuthenticationFailedException("failed to connect");
-	}
+	//setURLName(new URLName(protocol, host, port, file, user, password));
 
-	setURLName(new URLName(protocol, host, port, file, user, password));
-
+	/*
 	if (save)
 	    session.setPasswordAuthentication(getURLName(),
 			    new PasswordAuthentication(user, password));
+			    */
 
 	// set our connected state
 	setConnected(true);
@@ -449,10 +280,7 @@ public abstract class MnService implements AutoCloseable {
      * @exception AuthenticationFailedException	for authentication failures
      * @exception MessagingException	for non-authentication failures
      */
-    protected boolean protocolConnect(String host, int port, String user,
-				String password) throws MessagingException {
-	return false;
-    }
+    protected abstract boolean protocolConnect() throws MessagingException;
 
     /**
      * Is this service currently connected? <p>
