@@ -42,6 +42,9 @@ package com.s8.core.web.manganese.activation;
 
 import java.net.URL;
 import java.net.URLConnection;
+
+import com.s8.core.web.manganese.mail.handlers.DataSource;
+
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.IOException;
@@ -54,8 +57,8 @@ import java.io.IOException;
  * DataHandler object creates a URLDataSource internally,
  * when it is constructed with a URL.</i>
  *
- * @see com.s8.core.web.manganese.activation.DataSource
- * @see com.s8.core.web.manganese.activation.DataHandler
+ * @see com.s8.core.web.manganese.mail.handlers.DataSource
+ * @see com.s8.core.web.manganese.mail.handlers.DataHandler
  */
 public class URLDataSource implements DataSource {
     private URL url = null;

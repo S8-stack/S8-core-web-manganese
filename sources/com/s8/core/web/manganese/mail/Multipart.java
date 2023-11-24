@@ -42,7 +42,7 @@ package com.s8.core.web.manganese.mail;
 
 import java.util.Vector;
 
-import com.s8.core.web.manganese.activation.DataSource;
+import com.s8.core.web.manganese.mail.handlers.DataSource;
 
 import java.io.InputStream;
 import java.io.OutputStream;

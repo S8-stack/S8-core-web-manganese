@@ -40,20 +40,56 @@
 
 package com.s8.core.web.manganese.mail.handlers;
 
-import java.awt.Image;
+import java.io.IOException;
+import java.io.OutputStream;
 
 import com.s8.core.web.manganese.activation.ActivationDataFlavor;
+import com.s8.core.web.manganese.mail.MessagingException;
+import com.s8.core.web.manganese.mail.Multipart;
+import com.s8.core.web.manganese.mail.internet.MimeMultipart;
 
-/**
- * DataContentHandler for image/jpeg.
- */
-public class image_jpeg extends image_gif {
+
+public class DataContentHandler_multipart_mixed extends BaseDataContentHandler {
     private static ActivationDataFlavor[] myDF = {
-	new ActivationDataFlavor(Image.class, "image/jpeg", "JPEG Image")
+	new ActivationDataFlavor(Multipart.class,
+				    "multipart/mixed", "Multipart")
     };
 
     @Override
     protected ActivationDataFlavor[] getDataFlavors() {
 	return myDF;
+    }
+
+    /**
+     * Return the content.
+     */
+    @Override
+    public Object getContent(DataSource ds) throws IOException {
+	try {
+	    return new MimeMultipart(ds); 
+	} catch (MessagingException e) {
+	    IOException ioex =
+		new IOException("Exception while constructing MimeMultipart");
+	    ioex.initCause(e);
+	    throw ioex;
+	}
+    }
+    
+    /**
+     * Write the object to the output stream, using the specific MIME type.
+     */
+    @Override
+    public void writeTo(Object obj, String mimeType, OutputStream os) 
+			throws IOException {
+	if (obj instanceof Multipart) {
+	    try {
+		((Multipart)obj).writeTo(os);
+	    } catch (MessagingException e) {
+		IOException ioex =
+		    new IOException("Exception writing Multipart");
+		ioex.initCause(e);
+		throw ioex;
+	    }
+	}
     }
 }

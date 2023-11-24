@@ -50,8 +50,8 @@ package com.s8.core.web.manganese.mail;
  * context in which a data content object is operating.
  *
  * @see com.s8.core.web.manganese.mail.MessageAware
- * @see com.s8.core.web.manganese.activation.DataSource
- * @see com.s8.core.web.manganese.activation.DataContentHandler
+ * @see com.s8.core.web.manganese.mail.handlers.DataSource
+ * @see com.s8.core.web.manganese.mail.handlers.DataContentHandler
  * @since	JavaMail 1.1
  */
 public class MessageContext {

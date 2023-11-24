@@ -51,7 +51,6 @@ import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
 import com.s8.core.web.manganese.activation.ActivationDataFlavor;
-import com.s8.core.web.manganese.activation.DataSource;
 import com.s8.core.web.manganese.mail.internet.ContentType;
 import com.s8.core.web.manganese.mail.internet.ParseException;
 
@@ -61,7 +60,7 @@ import com.s8.core.web.manganese.mail.internet.ParseException;
  * @author Anil Vijendran
  * @author Bill Shannon
  */
-public class text_xml extends text_plain {
+public class DataContentHandler_text_xml extends DataContentHandler_text_plain {
 
     private static final ActivationDataFlavor[] flavors = {
 	new ActivationDataFlavor(String.class, "text/xml", "XML String"),

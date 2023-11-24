@@ -59,7 +59,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 import com.s8.core.web.manganese.activation.CommandObject;
-import com.s8.core.web.manganese.activation.DataHandler;
+import com.s8.core.web.manganese.mail.handlers.DataHandler;
 
 public class TextEditor extends Panel implements CommandObject,
     ActionListener {

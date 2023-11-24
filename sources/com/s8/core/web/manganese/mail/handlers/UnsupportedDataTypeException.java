@@ -35,27 +35,40 @@
  */
 
 /*
- * @(#)DataContentHandlerFactory.java	1.7 07/05/14
+ * @(#)UnsupportedDataTypeException.java	1.10 07/05/14
  */
 
-package com.s8.core.web.manganese.activation;
+package com.s8.core.web.manganese.mail.handlers;
+
+import java.io.IOException;
 
 /**
- * This interface defines a factory for <code>DataContentHandlers</code>. An
- * implementation of this interface should map a MIME type into an
- * instance of DataContentHandler. The design pattern for classes implementing
- * this interface is the same as for the ContentHandler mechanism used in
- * <code>java.net.URL</code>.
+ * Signals that the requested operation does not support the
+ * requested data type.
+ *
+ * @see com.s8.core.web.manganese.mail.handlers.DataHandler
  */
 
-public interface DataContentHandlerFactory {
+public class UnsupportedDataTypeException extends IOException {
 
-    /**
-     * Creates a new DataContentHandler object for the MIME type.
-     *
-     * @param mimeType the MIME type to create the DataContentHandler for.
-     * @return The new <code>DataContentHandler</code>, or <i>null</i>
-     * if none are found.
-     */
-    public DataContentHandler createDataContentHandler(String mimeType);
+
+	private static final long serialVersionUID = 7747178820174038433L;
+
+	/**
+	 * Constructs an UnsupportedDataTypeException with no detail
+	 * message.
+	 */
+	public UnsupportedDataTypeException() {
+		super();
+	}
+
+	/**
+	 * Constructs an UnsupportedDataTypeException with the specified 
+	 * message.
+	 * 
+	 * @param message The detail message.
+	 */
+	public UnsupportedDataTypeException(String message) {
+		super(message);
+	}
 }

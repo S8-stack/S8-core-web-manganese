@@ -91,7 +91,7 @@ public class PreencodedMimeBodyPart extends MimeBodyPart {
      *				stream or if an error is generated
      *				by the javax.activation layer.
      * @exception MessagingException for other failures
-     * @see com.s8.core.web.manganese.activation.DataHandler#writeTo
+     * @see com.s8.core.web.manganese.mail.handlers.DataHandler#writeTo
      */
     @Override
     public void writeTo(OutputStream os)

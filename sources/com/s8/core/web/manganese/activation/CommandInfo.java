@@ -41,6 +41,9 @@
 package com.s8.core.web.manganese.activation;
 
 import java.io.*;
+
+import com.s8.core.web.manganese.mail.handlers.DataHandler;
+
 import java.beans.Beans;
 
 /**

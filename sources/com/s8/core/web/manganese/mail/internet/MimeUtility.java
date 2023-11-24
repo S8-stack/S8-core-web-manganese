@@ -57,10 +57,10 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.StringTokenizer;
 
-import com.s8.core.web.manganese.activation.DataHandler;
-import com.s8.core.web.manganese.activation.DataSource;
 import com.s8.core.web.manganese.mail.EncodingAware;
 import com.s8.core.web.manganese.mail.MessagingException;
+import com.s8.core.web.manganese.mail.handlers.DataHandler;
+import com.s8.core.web.manganese.mail.handlers.DataSource;
 import com.s8.core.web.manganese.mail.util.ASCIIUtility;
 import com.s8.core.web.manganese.mail.util.BASE64DecoderStream;
 import com.s8.core.web.manganese.mail.util.BASE64EncoderStream;

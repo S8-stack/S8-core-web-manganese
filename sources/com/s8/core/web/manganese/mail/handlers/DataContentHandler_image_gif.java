@@ -40,73 +40,64 @@
 
 package com.s8.core.web.manganese.mail.handlers;
 
-import java.awt.datatransfer.DataFlavor;
+import java.awt.Image;
+import java.awt.Toolkit;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 
 import com.s8.core.web.manganese.activation.ActivationDataFlavor;
-import com.s8.core.web.manganese.activation.DataContentHandler;
-import com.s8.core.web.manganese.activation.DataSource;
 
 /**
- * Base class for other DataContentHandlers.
+ * DataContentHandler for image/gif.
  */
-public abstract class handler_base implements DataContentHandler {
+public class DataContentHandler_image_gif extends BaseDataContentHandler {
 
-    /**
-     * Return an array of ActivationDataFlavors that we support.
-     * Usually there will be only one.
-     *
-     * @return	array of ActivationDataFlavors that we support
-     */
-    protected abstract ActivationDataFlavor[] getDataFlavors();
+	private static ActivationDataFlavor[] myDF = {
+			new ActivationDataFlavor(Image.class, "image/gif", "GIF Image")
+	};
 
-    /**
-     * Given the flavor that matched, return the appropriate type of object.
-     * Usually there's only one flavor so just call getContent.
-     *
-     * @param	aFlavor	the ActivationDataFlavor
-     * @param	ds	DataSource containing the data
-     * @return	the object
-     * @exception	IOException	for errors reading the data
-     */
-    protected Object getData(ActivationDataFlavor aFlavor, DataSource ds)
-				throws IOException {
-	return getContent(ds);
-    }
-
-    /**
-     * Return the DataFlavors for this <code>DataContentHandler</code>.
-     *
-     * @return The DataFlavors
-     */
-    @Override
-    public DataFlavor[] getTransferDataFlavors() {
-	ActivationDataFlavor[] adf = getDataFlavors();
-	if (adf.length == 1)	// the common case
-	    return new DataFlavor[] { adf[0] };
-	DataFlavor[] df = new DataFlavor[adf.length];
-	System.arraycopy(adf, 0, df, 0, adf.length);
-	return df;
-    }
-
-    /**
-     * Return the Transfer Data of type DataFlavor from InputStream.
-     *
-     * @param	df	The DataFlavor
-     * @param	ds	The DataSource corresponding to the data
-     * @return	the object
-     * @exception	IOException	for errors reading the data
-     */
-    @Override
-    public Object getTransferData(DataFlavor df, DataSource ds) 
-			throws IOException {
-	ActivationDataFlavor[] adf = getDataFlavors();
-	for (int i = 0; i < adf.length; i++) {
-	    // use ActivationDataFlavor.equals, which properly
-	    // ignores Content-Type parameters in comparison
-	    if (adf[i].equals(df))
-		return getData(adf[i], ds);
+	@Override
+	protected ActivationDataFlavor[] getDataFlavors() {
+		return myDF;
 	}
-	return null;
-    }
+
+	@Override
+	public Object getContent(DataSource ds) throws IOException {
+		InputStream is = ds.getInputStream();
+		int pos = 0;
+		int count;
+		byte buf[] = new byte[1024];
+
+		while ((count = is.read(buf, pos, buf.length - pos)) != -1) {
+			pos += count;
+			if (pos >= buf.length) {
+				int size = buf.length;
+				if (size < 256*1024)
+					size += size;
+				else
+					size += 256*1024;
+				byte tbuf[] = new byte[size];
+				System.arraycopy(buf, 0, tbuf, 0, pos);
+				buf = tbuf;
+			}
+		}
+		Toolkit tk = Toolkit.getDefaultToolkit();
+		return tk.createImage(buf, 0, pos);
+	}
+
+	/**
+	 * Write the object to the output stream, using the specified MIME type.
+	 */
+	@Override
+	public void writeTo(Object obj, String type, OutputStream os)
+			throws IOException {
+		if (!(obj instanceof Image))
+			throw new IOException("\"" + getDataFlavors()[0].getMimeType() +
+					"\" DataContentHandler requires Image object, " +
+					"was given object of type " + obj.getClass().toString());
+
+		throw new IOException(getDataFlavors()[0].getMimeType() +
+				" encoding not supported");
+	}
 }

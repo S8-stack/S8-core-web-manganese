@@ -50,7 +50,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import com.s8.core.web.manganese.activation.CommandObject;
-import com.s8.core.web.manganese.activation.DataHandler;
+import com.s8.core.web.manganese.mail.handlers.DataHandler;
 
 public class TextViewer extends Panel implements CommandObject {
     // UI Vars...

@@ -42,6 +42,8 @@ package com.s8.core.web.manganese.activation;
 
 import java.io.IOException;
 
+import com.s8.core.web.manganese.mail.handlers.DataHandler;
+
 /**
  * JavaBeans components that are Activation Framework aware implement
  * this interface to find out which command verb they're being asked

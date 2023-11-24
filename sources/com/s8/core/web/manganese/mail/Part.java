@@ -43,7 +43,7 @@ package com.s8.core.web.manganese.mail;
 import java.io.*;
 import java.util.Enumeration;
 
-import com.s8.core.web.manganese.activation.DataHandler;
+import com.s8.core.web.manganese.mail.handlers.DataHandler;
 
 /**
  * The <code>Part</code> interface is the common base interface for 
@@ -134,7 +134,7 @@ public interface Part {
      *
      * @return		The ContentType of this part
      * @exception	MessagingException for failures
-     * @see		com.s8.core.web.manganese.activation.DataHandler
+     * @see		com.s8.core.web.manganese.mail.handlers.DataHandler
      */
     public String getContentType() throws MessagingException;
 
@@ -269,7 +269,7 @@ public interface Part {
      *			javax.activation.DataHandler for more details.
      * @exception	MessagingException for other failures
      * @see #getDataHandler
-     * @see com.s8.core.web.manganese.activation.DataHandler#getInputStream
+     * @see com.s8.core.web.manganese.mail.handlers.DataHandler#getInputStream
      */
     public InputStream getInputStream() 
 		throws IOException, MessagingException;
@@ -301,7 +301,7 @@ public interface Part {
      *			javax.activation.DataHandler for more details.
      * @exception 	MessagingException for other failures
      *
-     * @see com.s8.core.web.manganese.activation.DataHandler#getContent
+     * @see com.s8.core.web.manganese.mail.handlers.DataHandler#getContent
      */
     public Object getContent() throws IOException, MessagingException;
 
@@ -384,7 +384,7 @@ public interface Part {
      * @exception MessagingException	if an error occurs fetching the
      *					data to be written
      *
-     * @see com.s8.core.web.manganese.activation.DataHandler#writeTo
+     * @see com.s8.core.web.manganese.mail.handlers.DataHandler#writeTo
      */
     public void writeTo(OutputStream os) throws IOException, MessagingException;
 

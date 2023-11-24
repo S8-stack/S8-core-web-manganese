@@ -53,8 +53,6 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
 
-import com.s8.core.web.manganese.activation.DataHandler;
-import com.s8.core.web.manganese.activation.DataSource;
 import com.s8.core.web.manganese.activation.FileDataSource;
 import com.s8.core.web.manganese.mail.BodyPart;
 import com.s8.core.web.manganese.mail.EncodingAware;
@@ -64,6 +62,8 @@ import com.s8.core.web.manganese.mail.Message;
 import com.s8.core.web.manganese.mail.MessagingException;
 import com.s8.core.web.manganese.mail.Multipart;
 import com.s8.core.web.manganese.mail.Part;
+import com.s8.core.web.manganese.mail.handlers.DataHandler;
+import com.s8.core.web.manganese.mail.handlers.DataSource;
 import com.s8.core.web.manganese.mail.util.ASCIIUtility;
 import com.s8.core.web.manganese.mail.util.LineOutputStream;
 import com.s8.core.web.manganese.mail.util.MimeUtil;
@@ -608,7 +608,7 @@ public class MimeBodyPart extends BodyPart implements MimePart {
      * @exception	MessagingException for other failures
      *
      * @see	#getContentStream
-     * @see 	com.s8.core.web.manganese.activation.DataHandler#getInputStream
+     * @see 	com.s8.core.web.manganese.mail.handlers.DataHandler#getInputStream
      */
     @Override
     public InputStream getInputStream() 
@@ -1004,7 +1004,7 @@ public class MimeBodyPart extends BodyPart implements MimePart {
      *				stream or if an error is generated
      *				by the javax.activation layer.
      * @exception MessagingException for other failures
-     * @see com.s8.core.web.manganese.activation.DataHandler#writeTo
+     * @see com.s8.core.web.manganese.mail.handlers.DataHandler#writeTo
      */
     @Override
     public void writeTo(OutputStream os)

@@ -44,6 +44,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 import com.s8.core.web.manganese.activation.registries.MimeTypeFile;
+import com.s8.core.web.manganese.mail.handlers.DataSource;
 
 import java.io.File;
 import java.io.FileDescriptor;
@@ -66,7 +67,7 @@ import java.io.IOException;
  * FileTypeMap is set, the FileDataSource will call the FileTypeMap's
  * getDefaultFileTypeMap method to get the System's default FileTypeMap.
  *
- * @see com.s8.core.web.manganese.activation.DataSource
+ * @see com.s8.core.web.manganese.mail.handlers.DataSource
  * @see com.s8.core.web.manganese.activation.FileTypeMap
  * @see com.s8.core.web.manganese.activation.MimetypesFileTypeMap
  */
@@ -148,7 +149,7 @@ public class FileDataSource implements DataSource {
      * will return the file name of the object.
      *
      * @return the name of the object.
-     * @see com.s8.core.web.manganese.activation.DataSource
+     * @see com.s8.core.web.manganese.mail.handlers.DataSource
      */
     public String getName() {
 	return _file.getName();

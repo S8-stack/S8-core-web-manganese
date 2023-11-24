@@ -41,7 +41,7 @@
 package com.s8.core.web.manganese.mail;
 
 /**
- * A {@link com.s8.core.web.manganese.activation.DataSource DataSource} that also implements
+ * A {@link com.s8.core.web.manganese.mail.handlers.DataSource DataSource} that also implements
  * <code>EncodingAware</code> may specify the Content-Transfer-Encoding
  * to use for its data.  Valid Content-Transfer-Encoding values specified
  * by RFC 2045 are "7bit", "8bit", "quoted-printable", "base64", and "binary".

@@ -40,19 +40,71 @@
 
 package com.s8.core.web.manganese.mail.handlers;
 
+import java.awt.datatransfer.DataFlavor;
+import java.io.IOException;
+
 import com.s8.core.web.manganese.activation.ActivationDataFlavor;
 
 /**
- * DataContentHandler for text/html.
- *
+ * Base class for other DataContentHandlers.
  */
-public class text_html extends text_plain {
-    private static ActivationDataFlavor[] myDF = {
-	new ActivationDataFlavor(String.class, "text/html", "HTML String")
-    };
+public abstract class BaseDataContentHandler implements DataContentHandler {
 
+    /**
+     * Return an array of ActivationDataFlavors that we support.
+     * Usually there will be only one.
+     *
+     * @return	array of ActivationDataFlavors that we support
+     */
+    protected abstract ActivationDataFlavor[] getDataFlavors();
+
+    /**
+     * Given the flavor that matched, return the appropriate type of object.
+     * Usually there's only one flavor so just call getContent.
+     *
+     * @param	aFlavor	the ActivationDataFlavor
+     * @param	ds	DataSource containing the data
+     * @return	the object
+     * @exception	IOException	for errors reading the data
+     */
+    protected Object getData(ActivationDataFlavor aFlavor, DataSource ds)
+				throws IOException {
+	return getContent(ds);
+    }
+
+    /**
+     * Return the DataFlavors for this <code>DataContentHandler</code>.
+     *
+     * @return The DataFlavors
+     */
     @Override
-    protected ActivationDataFlavor[] getDataFlavors() {
-	return myDF;
+    public DataFlavor[] getTransferDataFlavors() {
+	ActivationDataFlavor[] adf = getDataFlavors();
+	if (adf.length == 1)	// the common case
+	    return new DataFlavor[] { adf[0] };
+	DataFlavor[] df = new DataFlavor[adf.length];
+	System.arraycopy(adf, 0, df, 0, adf.length);
+	return df;
+    }
+
+    /**
+     * Return the Transfer Data of type DataFlavor from InputStream.
+     *
+     * @param	df	The DataFlavor
+     * @param	ds	The DataSource corresponding to the data
+     * @return	the object
+     * @exception	IOException	for errors reading the data
+     */
+    @Override
+    public Object getTransferData(DataFlavor df, DataSource ds) 
+			throws IOException {
+	ActivationDataFlavor[] adf = getDataFlavors();
+	for (int i = 0; i < adf.length; i++) {
+	    // use ActivationDataFlavor.equals, which properly
+	    // ignores Content-Type parameters in comparison
+	    if (adf[i].equals(df))
+		return getData(adf[i], ds);
+	}
+	return null;
     }
 }

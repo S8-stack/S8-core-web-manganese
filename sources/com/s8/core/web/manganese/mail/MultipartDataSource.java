@@ -40,7 +40,7 @@
 
 package com.s8.core.web.manganese.mail;
 
-import com.s8.core.web.manganese.activation.DataSource;
+import com.s8.core.web.manganese.mail.handlers.DataSource;
 
 /**
  * MultipartDataSource is a <code>DataSource</code> that contains body
@@ -56,7 +56,7 @@ import com.s8.core.web.manganese.activation.DataSource;
  * preparse multipart bodies, for example an IMAP provider.
  *
  * @author	John Mani
- * @see		com.s8.core.web.manganese.activation.DataSource
+ * @see		com.s8.core.web.manganese.mail.handlers.DataSource
  */
 
 public interface MultipartDataSource extends DataSource {

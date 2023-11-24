@@ -48,7 +48,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import com.s8.core.web.manganese.activation.DataSource;
 import com.s8.core.web.manganese.mail.BodyPart;
 import com.s8.core.web.manganese.mail.IllegalWriteException;
 import com.s8.core.web.manganese.mail.MessageAware;
@@ -56,6 +55,7 @@ import com.s8.core.web.manganese.mail.MessageContext;
 import com.s8.core.web.manganese.mail.MessagingException;
 import com.s8.core.web.manganese.mail.Multipart;
 import com.s8.core.web.manganese.mail.MultipartDataSource;
+import com.s8.core.web.manganese.mail.handlers.DataSource;
 import com.s8.core.web.manganese.mail.util.ASCIIUtility;
 import com.s8.core.web.manganese.mail.util.LineInputStream;
 import com.s8.core.web.manganese.mail.util.LineOutputStream;

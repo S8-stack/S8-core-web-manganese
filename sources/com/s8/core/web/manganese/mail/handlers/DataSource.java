@@ -38,7 +38,7 @@
  * @(#)DataSource.java	1.12 07/05/14
  */
 
-package com.s8.core.web.manganese.activation;
+package com.s8.core.web.manganese.mail.handlers;
 
 import java.io.InputStream;
 import java.io.OutputStream;

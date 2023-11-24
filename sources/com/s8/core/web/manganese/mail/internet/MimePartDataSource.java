@@ -45,17 +45,17 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.UnknownServiceException;
 
-import com.s8.core.web.manganese.activation.DataSource;
 import com.s8.core.web.manganese.mail.MessageAware;
 import com.s8.core.web.manganese.mail.MessageContext;
 import com.s8.core.web.manganese.mail.MessagingException;
+import com.s8.core.web.manganese.mail.handlers.DataSource;
 
 /**
  * A utility class that implements a DataSource out of
  * a MimePart. This class is primarily meant for service providers.
  *
  * @see		com.s8.core.web.manganese.mail.internet.MimePart
- * @see		com.s8.core.web.manganese.activation.DataSource
+ * @see		com.s8.core.web.manganese.mail.handlers.DataSource
  * @author 	John Mani
  */
 

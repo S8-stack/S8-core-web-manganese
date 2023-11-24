@@ -4,14 +4,14 @@ import java.io.UnsupportedEncodingException;
 import java.util.Date;
 import java.util.Properties;
 
-import com.s8.core.web.manganese.activation.DataHandler;
-import com.s8.core.web.manganese.activation.DataSource;
 import com.s8.core.web.manganese.activation.FileDataSource;
 import com.s8.core.web.manganese.critical.Credentials;
 import com.s8.core.web.manganese.mail.BodyPart;
 import com.s8.core.web.manganese.mail.Message;
 import com.s8.core.web.manganese.mail.MessagingException;
 import com.s8.core.web.manganese.mail.Multipart;
+import com.s8.core.web.manganese.mail.handlers.DataHandler;
+import com.s8.core.web.manganese.mail.handlers.DataSource;
 import com.s8.core.web.manganese.mail.internet.InternetAddress;
 import com.s8.core.web.manganese.mail.internet.MimeBodyPart;
 import com.s8.core.web.manganese.mail.internet.MimeMessage;
