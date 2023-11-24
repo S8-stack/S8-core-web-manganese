@@ -33,9 +33,7 @@ public class TestMail4 {
 		
 		System.out.println("TLSEmail Start");
 		
-		
-		
-		
+
 		Properties props = new Properties();
 		props.put("mail.smtp.host", "smtp.gmail.com"); //SMTP Host
 		props.put("mail.smtp.port", "587"); //TLS Port

@@ -18,7 +18,12 @@ public class SMTP_ConnectionParams {
 	 */
 	public final static int DEFAULT_SECURE_PORT = 465;
 	
+	
+	/**
+	 * 
+	 */
 	public final static int DEFAULT_UNSECURE_PORT = 25;
+	
 	
 	/**
 	 * 

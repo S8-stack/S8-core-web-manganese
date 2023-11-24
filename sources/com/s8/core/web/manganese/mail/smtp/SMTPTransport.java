@@ -190,7 +190,7 @@ public class SMTPTransport extends MnTransportService {
 		this.props = props;
 		
 		this.isSSL = params.isSecured();
-		if(isSSL) {
+		if(params.isSecured()) {
 			props.auth = true;
 			props.requireStartTLS = true;
 			props.useStartTLS = true;
