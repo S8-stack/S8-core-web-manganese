@@ -29,8 +29,6 @@ public class TestMail4 {
 	   Port for TLS/STARTTLS: 587
 	 */
 	public static void main(String[] args) {
-		final String fromEmail = Credentials.DEMO_USERNAME; //requires valid gmail id
-		final String password = Credentials.DEMO_PASSWORD; // correct password for gmail id
 		final String toEmail = Credentials.DEMO_RECIPIENT; // can be any email id 
 		
 		System.out.println("TLSEmail Start");
@@ -44,7 +42,9 @@ public class TestMail4 {
 		props.put("mail.smtp.auth", "true"); //enable authentication
 		props.put("mail.smtp.starttls.enable", "true"); //enable STARTTLS
 		
-		sendImageEmail(toEmail, "TLSEmail Testing Subject", "TLSEmail Testing Body");
+		sendImageEmail(toEmail, 
+				"TLSEmail Testing Subject: "+new Date(System.currentTimeMillis()), 
+				"TLSEmail Testing Body: "+Long.toHexString(System.nanoTime()));
 		
 	}
 	

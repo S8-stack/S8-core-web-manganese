@@ -18,6 +18,9 @@ module com.s8.core.web.manganese {
 	requires java.logging;
 	requires java.desktop;
 	requires java.security.sasl;
+	requires java.naming;
+	
+	requires org.slf4j;
 	
 	
 }
