@@ -38,7 +38,7 @@
  * holder.
  */
 
-package com.s8.core.web.manganese.mail.smtp;
+package com.s8.core.web.manganese.mail.smtp.streams;
 
 import java.io.*;
 

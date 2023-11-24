@@ -81,6 +81,8 @@ import com.s8.core.web.manganese.mail.smtp.authentication.LoginAuthenticator;
 import com.s8.core.web.manganese.mail.smtp.authentication.NtlmAuthenticator;
 import com.s8.core.web.manganese.mail.smtp.authentication.OAuth2Authenticator;
 import com.s8.core.web.manganese.mail.smtp.authentication.PlainAuthenticator;
+import com.s8.core.web.manganese.mail.smtp.streams.BDATOutputStream;
+import com.s8.core.web.manganese.mail.smtp.streams.SMTPOutputStream;
 import com.s8.core.web.manganese.mail.util.ASCIIUtility;
 import com.s8.core.web.manganese.mail.util.LineInputStream;
 import com.s8.core.web.manganese.mail.util.MailConnectException;
@@ -158,7 +160,7 @@ public class SMTPTransport extends MnTransportService {
 	public MailLogger logger;		// debug logger
 	public MailLogger traceLogger;	// protocol trace logger
 	private String localHostName;	// our own host name
-	private String lastServerResponse;	// last SMTP response
+	public String lastServerResponse;	// last SMTP response
 	private int lastReturnCode;		// last SMTP return code
 	private boolean notificationDone;	// only notify once per send
 
@@ -1668,7 +1670,7 @@ public class SMTPTransport extends MnTransportService {
 	 */
 	protected OutputStream bdat() throws MessagingException {
 		assert Thread.holdsLock(this);
-		dataStream = new BDATOutputStream(serverOutput, props.chunkSize);
+		dataStream = new BDATOutputStream(this, serverOutput, props.chunkSize);
 		return dataStream;
 	}
 
@@ -1946,7 +1948,7 @@ public class SMTPTransport extends MnTransportService {
 	 * @exception	MessagingException for failures
 	 * @since JavaMail 1.4.1
 	 */
-	protected void sendCommand(String cmd) throws MessagingException {
+	public void sendCommand(String cmd) throws MessagingException {
 		sendCommand(toBytes(cmd));
 	}
 
@@ -1973,7 +1975,7 @@ public class SMTPTransport extends MnTransportService {
 	 * @exception	MessagingException for failures
 	 * @since JavaMail 1.4.1
 	 */
-	protected int readServerResponse() throws MessagingException {
+	public int readServerResponse() throws MessagingException {
 		assert Thread.holdsLock(this);
 		String serverResponse = "";
 		int returnCode = 0;
@@ -2228,136 +2230,7 @@ public class SMTPTransport extends MnTransportService {
 	private void sendMessageEnd() { }
 
 
-	/**
-	 * An SMTPOutputStream that wraps a ChunkedOutputStream.
-	 */
-	private class BDATOutputStream extends SMTPOutputStream {
+	
 
-		/**
-		 * Create a BDATOutputStream that wraps a ChunkedOutputStream
-		 * of the given size and built on top of the specified
-		 * underlying output stream.
-		 *
-		 * @param	out	the underlying output stream
-		 * @param	size	the chunk size
-		 */
-		public BDATOutputStream(OutputStream out, int size) {
-			super(new ChunkedOutputStream(out, size));
-		}
-
-		/**
-		 * Close this output stream.
-		 *
-		 * @exception	IOException	for I/O errors
-		 */
-		@Override
-		public void close() throws IOException {
-			out.close();
-		}
-	}
-
-	/**
-	 * An OutputStream that buffers data in chunks and uses the
-	 * RFC 3030 BDAT SMTP command to send each chunk.
-	 */
-	private class ChunkedOutputStream extends OutputStream {
-		private final OutputStream out;
-		private final byte[] buf;
-		private int count = 0;
-
-		/**
-		 * Create a ChunkedOutputStream built on top of the specified
-		 * underlying output stream.
-		 *
-		 * @param	out	the underlying output stream
-		 * @param	size	the chunk size
-		 */
-		public ChunkedOutputStream(OutputStream out, int size) {
-			this.out = out;
-			buf = new byte[size];
-		}
-
-		/**
-		 * Writes the specified <code>byte</code> to this output stream.
-		 *
-		 * @param	b	the byte to write
-		 * @exception	IOException	for I/O errors
-		 */
-		@Override
-		public void write(int b) throws IOException {
-			buf[count++] = (byte)b;
-			if (count >= buf.length)
-				flush();
-		}
-
-		/**
-		 * Writes len bytes to this output stream starting at off.
-		 *
-		 * @param	b	bytes to write
-		 * @param	off	offset in array
-		 * @param	len	number of bytes to write
-		 * @exception	IOException	for I/O errors
-		 */
-		@Override
-		public void write(byte b[], int off, int len) throws IOException {
-			while (len > 0) {
-				int size = Math.min(buf.length - count, len);
-				if (size == buf.length) {
-					// avoid the copy
-					bdat(b, off, size, false);
-				} else {
-					System.arraycopy(b, off, buf, count, size);
-					count += size;
-				}
-				off += size;
-				len -= size;
-				if (count >= buf.length)
-					flush();
-			}
-		}
-
-		/**
-		 * Flush this output stream.
-		 *
-		 * @exception	IOException	for I/O errors
-		 */
-		@Override
-		public void flush() throws IOException {
-			bdat(buf, 0, count, false);
-			count = 0;
-		}
-
-		/**
-		 * Close this output stream.
-		 *
-		 * @exception	IOException	for I/O errors
-		 */
-		@Override
-		public void close() throws IOException {
-			bdat(buf, 0, count, true);
-			count = 0;
-		}
-
-		/**
-		 * Send the specified bytes using the BDAT command.
-		 */
-		private void bdat(byte[] b, int off, int len, boolean last)
-				throws IOException {
-			if (len > 0 || last) {
-				try {
-					if (last)
-						sendCommand("BDAT " + len + " LAST");
-					else
-						sendCommand("BDAT " + len);
-					out.write(b, off, len);
-					out.flush();
-					int ret = readServerResponse();
-					if (ret != 250)
-						throw new IOException(lastServerResponse);
-				} catch (MessagingException mex) {
-					throw new IOException("BDAT write exception", mex);
-				}
-			}
-		}
-	}
+	
 }
