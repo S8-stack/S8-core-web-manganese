@@ -43,7 +43,6 @@ package com.s8.core.web.manganese.mail.smtp;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -70,15 +69,19 @@ import com.s8.core.web.manganese.mail.Message;
 import com.s8.core.web.manganese.mail.MessagingException;
 import com.s8.core.web.manganese.mail.MnTransportService;
 import com.s8.core.web.manganese.mail.SendFailedException;
-import com.s8.core.web.manganese.mail.auth.Ntlm;
 import com.s8.core.web.manganese.mail.event.TransportEvent;
 import com.s8.core.web.manganese.mail.internet.AddressException;
 import com.s8.core.web.manganese.mail.internet.InternetAddress;
 import com.s8.core.web.manganese.mail.internet.MimeMessage;
 import com.s8.core.web.manganese.mail.internet.MimeMultipart;
 import com.s8.core.web.manganese.mail.internet.MimePart;
+import com.s8.core.web.manganese.mail.smtp.authentication.Authenticator;
+import com.s8.core.web.manganese.mail.smtp.authentication.DigestMD5Authenticator;
+import com.s8.core.web.manganese.mail.smtp.authentication.LoginAuthenticator;
+import com.s8.core.web.manganese.mail.smtp.authentication.NtlmAuthenticator;
+import com.s8.core.web.manganese.mail.smtp.authentication.OAuth2Authenticator;
+import com.s8.core.web.manganese.mail.smtp.authentication.PlainAuthenticator;
 import com.s8.core.web.manganese.mail.util.ASCIIUtility;
-import com.s8.core.web.manganese.mail.util.BASE64EncoderStream;
 import com.s8.core.web.manganese.mail.util.LineInputStream;
 import com.s8.core.web.manganese.mail.util.MailConnectException;
 import com.s8.core.web.manganese.mail.util.MailLogger;
@@ -122,7 +125,7 @@ import com.s8.core.web.manganese.mail.util.TraceOutputStream;
 
 public class SMTPTransport extends MnTransportService {
 
-	private SMTP_TransportProps props;
+	public SMTP_TransportProps props;
 	
 	private boolean isSSL = false;	// use SSL?
 
@@ -152,8 +155,8 @@ public class SMTPTransport extends MnTransportService {
 	
 
 
-	private MailLogger logger;		// debug logger
-	private MailLogger traceLogger;	// protocol trace logger
+	public MailLogger logger;		// debug logger
+	public MailLogger traceLogger;	// protocol trace logger
 	private String localHostName;	// our own host name
 	private String lastServerResponse;	// last SMTP response
 	private int lastReturnCode;		// last SMTP return code
@@ -198,11 +201,11 @@ public class SMTPTransport extends MnTransportService {
 
 		// created here, because they're inner classes that reference "this"
 		Authenticator[] a = new Authenticator[] {
-				new LoginAuthenticator(),
-				new PlainAuthenticator(),
-				new DigestMD5Authenticator(),
-				new NtlmAuthenticator(),
-				new OAuth2Authenticator()
+				new LoginAuthenticator(this),
+				new PlainAuthenticator(this),
+				new DigestMD5Authenticator(this),
+				new NtlmAuthenticator(this),
+				new OAuth2Authenticator(this)
 		};
 		StringBuilder sb = new StringBuilder();
 		for (int i = 0; i < a.length; i++) {
@@ -744,258 +747,13 @@ public class SMTPTransport extends MnTransportService {
 				"No authentication mechanisms supported by both server and client");
 	}
 
-	/**
-	 * Abstract base class for SMTP authentication mechanism implementations.
-	 */
-	private abstract class Authenticator {
-		protected int resp;	// the response code, used by subclasses
-		private final String mech; // the mechanism name, set in the constructor
-		private final boolean enabled; // is this mechanism enabled by default?
+	
 
-		Authenticator(String mech) {
-			this(mech, true);
-		}
 
-		Authenticator(String mech, boolean enabled) {
-			this.mech = mech.toUpperCase(Locale.ENGLISH);
-			this.enabled = enabled;
-		}
 
-		String getMechanism() {
-			return mech;
-		}
+	
+	
 
-		boolean enabled() {
-			return enabled;
-		}
-
-		/**
-		 * Start the authentication handshake by issuing the AUTH command.
-		 * Delegate to the doAuth method to do the mechanism-specific
-		 * part of the handshake.
-		 */
-		boolean authenticate(String host, String authzid,
-				String user, String passwd) throws MessagingException {
-			Throwable thrown = null;
-			try {
-				// use "initial response" capability, if supported
-				String ir = getInitialResponse(host, authzid, user, passwd);
-				if (props.noauthdebug && isTracing()) {
-					logger.fine("AUTH " + mech + " command trace suppressed");
-					suspendTracing();
-				}
-				if (ir != null)
-					resp = simpleCommand("AUTH " + mech + " " +
-							(ir.length() == 0 ? "=" : ir));
-				else
-					resp = simpleCommand("AUTH " + mech);
-
-				/*
-				 * A 530 response indicates that the server wants us to
-				 * issue a STARTTLS command first.  Do that and try again.
-				 */
-				if (resp == 530) {
-					startTLS();
-					if (ir != null)
-						resp = simpleCommand("AUTH " + mech + " " + ir);
-					else
-						resp = simpleCommand("AUTH " + mech);
-				}
-				if (resp == 334)
-					doAuth(host, authzid, user, passwd);
-			} catch (IOException ex) {	// should never happen, ignore
-				logger.log(Level.FINE, "AUTH " + mech + " failed", ex);
-			} catch (Throwable t) {	// crypto can't be initialized?
-				logger.log(Level.FINE, "AUTH " + mech + " failed", t);
-				thrown = t;
-			} finally {
-				if (props.noauthdebug && isTracing())
-					logger.fine("AUTH " + mech + " " +
-							(resp == 235 ? "succeeded" : "failed"));
-				resumeTracing();
-				if (resp != 235) {
-					closeConnection();
-					if (thrown != null) {
-						if (thrown instanceof Error)
-							throw (Error)thrown;
-						if (thrown instanceof Exception)
-							throw new AuthenticationFailedException(
-									getLastServerResponse(),
-									(Exception)thrown);
-						assert false : "unknown Throwable";	// can't happen
-					}
-					throw new AuthenticationFailedException(
-							getLastServerResponse());
-				}
-			}
-			return true;
-		}
-
-		/**
-		 * Provide the initial response to use in the AUTH command,
-		 * or null if not supported.  Subclasses that support the
-		 * initial response capability will override this method.
-		 */
-		String getInitialResponse(String host, String authzid, String user,
-				String passwd) throws MessagingException, IOException {
-			return null;
-		}
-
-		abstract void doAuth(String host, String authzid, String user,
-				String passwd) throws MessagingException, IOException;
-	}
-
-	/**
-	 * Perform the authentication handshake for LOGIN authentication.
-	 */
-	private class LoginAuthenticator extends Authenticator {
-		LoginAuthenticator() {
-			super("LOGIN");
-		}
-
-		@Override
-		void doAuth(String host, String authzid, String user, String passwd)
-				throws MessagingException, IOException {
-			// send username
-			resp = simpleCommand(BASE64EncoderStream.encode(
-					user.getBytes(StandardCharsets.UTF_8)));
-			if (resp == 334) {
-				// send passwd
-				resp = simpleCommand(BASE64EncoderStream.encode(
-						passwd.getBytes(StandardCharsets.UTF_8)));
-			}
-		}
-	}
-
-	/**
-	 * Perform the authentication handshake for PLAIN authentication.
-	 */
-	private class PlainAuthenticator extends Authenticator {
-		PlainAuthenticator() {
-			super("PLAIN");
-		}
-
-		@Override
-		String getInitialResponse(String host, String authzid, String user,
-				String passwd) throws MessagingException, IOException {
-			// return "authzid<NUL>user<NUL>passwd"
-			ByteArrayOutputStream bos = new ByteArrayOutputStream();
-			OutputStream b64os =
-					new BASE64EncoderStream(bos, Integer.MAX_VALUE);
-			if (authzid != null)
-				b64os.write(authzid.getBytes(StandardCharsets.UTF_8));
-			b64os.write(0);
-			b64os.write(user.getBytes(StandardCharsets.UTF_8));
-			b64os.write(0);
-			b64os.write(passwd.getBytes(StandardCharsets.UTF_8));
-			b64os.flush(); 	// complete the encoding
-
-			return ASCIIUtility.toString(bos.toByteArray());
-		}
-
-		@Override
-		void doAuth(String host, String authzid, String user, String passwd)
-				throws MessagingException, IOException {
-			// should never get here
-			throw new AuthenticationFailedException("PLAIN asked for more");
-		}
-	}
-
-	/**
-	 * Perform the authentication handshake for DIGEST-MD5 authentication.
-	 */
-	private class DigestMD5Authenticator extends Authenticator {
-		private DigestMD5 md5support;	// only create if needed
-
-		DigestMD5Authenticator() {
-			super("DIGEST-MD5");
-		}
-
-		private synchronized DigestMD5 getMD5() {
-			if (md5support == null)
-				md5support = new DigestMD5(logger);
-			return md5support;
-		}
-
-		@Override
-		void doAuth(String host, String authzid, String user, String passwd)
-				throws MessagingException, IOException {
-			DigestMD5 md5 = getMD5();
-			assert md5 != null;
-
-			byte[] b = md5.authClient(host, user, passwd, getSASLRealm(),
-					getLastServerResponse());
-			resp = simpleCommand(b);
-			if (resp == 334) { // client authenticated by server
-				if (!md5.authServer(getLastServerResponse())) {
-					// server NOT authenticated by client !!!
-					resp = -1;
-				} else {
-					// send null response
-					resp = simpleCommand(new byte[0]);
-				}
-			}
-		}
-	}
-
-	/**
-	 * Perform the authentication handshake for NTLM authentication.
-	 */
-	private class NtlmAuthenticator extends Authenticator {
-		private Ntlm ntlm;
-		private int flags = 0;
-
-		NtlmAuthenticator() {
-			super("NTLM");
-		}
-
-		@Override
-		String getInitialResponse(String host, String authzid, String user,
-				String passwd) throws MessagingException, IOException {
-			ntlm = new Ntlm(getNTLMDomain(), getLocalHost(),
-					user, passwd, logger);
-
-			String type1 = ntlm.generateType1Msg(flags);
-			return type1;
-		}
-
-		@Override
-		void doAuth(String host, String authzid, String user, String passwd)
-				throws MessagingException, IOException {
-			assert ntlm != null;
-			String type3 = ntlm.generateType3Msg(
-					getLastServerResponse().substring(4).trim());
-
-			resp = simpleCommand(type3);
-		}
-	}
-
-	/**
-	 * Perform the authentication handshake for XOAUTH2 authentication.
-	 */
-	private class OAuth2Authenticator extends Authenticator {
-
-		OAuth2Authenticator() {
-			super("XOAUTH2", false);	// disabled by default
-		}
-
-		@Override
-		String getInitialResponse(String host, String authzid, String user,
-				String passwd) throws MessagingException, IOException {
-			String resp = "user=" + user + "\001auth=Bearer " +
-					passwd + "\001\001";
-			byte[] b = BASE64EncoderStream.encode(
-					resp.getBytes(StandardCharsets.UTF_8));
-			return ASCIIUtility.toString(b);
-		}
-
-		@Override
-		void doAuth(String host, String authzid, String user, String passwd)
-				throws MessagingException, IOException {
-			// should never get here
-			throw new AuthenticationFailedException("OAUTH2 asked for more");
-		}
-	}
 
 	/**
 	 * SASL-based login.
@@ -1278,7 +1036,7 @@ public class SMTPTransport extends MnTransportService {
 		}
 	}
 
-	private void closeConnection() throws MessagingException {
+	public void closeConnection() throws MessagingException {
 		try {
 			if (serverSocket != null)
 				serverSocket.close();
@@ -1934,7 +1692,7 @@ public class SMTPTransport extends MnTransportService {
 	 * @exception	MessagingException for failures
 	 * @since JavaMail 1.4.1
 	 */
-	protected void startTLS() throws MessagingException {
+	public void startTLS() throws MessagingException {
 		issueCommand("STARTTLS", 220);
 		// it worked, now switch the socket into TLS mode
 		try {
@@ -2069,7 +1827,7 @@ public class SMTPTransport extends MnTransportService {
 	/**
 	 * Is protocol tracing enabled?
 	 */
-	private boolean isTracing() {
+	public boolean isTracing() {
 		return traceLogger.isLoggable(Level.FINEST);
 	}
 
@@ -2077,7 +1835,7 @@ public class SMTPTransport extends MnTransportService {
 	 * Temporarily turn off protocol tracing, e.g., to prevent
 	 * tracing the authentication sequence, including the password.
 	 */
-	private void suspendTracing() {
+	public void suspendTracing() {
 		if (traceLogger.isLoggable(Level.FINEST)) {
 			traceInput.setTrace(false);
 			traceOutput.setTrace(false);
@@ -2087,7 +1845,7 @@ public class SMTPTransport extends MnTransportService {
 	/**
 	 * Resume protocol tracing, if it was enabled to begin with.
 	 */
-	private void resumeTracing() {
+	public void resumeTracing() {
 		if (traceLogger.isLoggable(Level.FINEST)) {
 			traceInput.setTrace(true);
 			traceOutput.setTrace(true);
@@ -2174,7 +1932,7 @@ public class SMTPTransport extends MnTransportService {
 	 * @exception	MessagingException for failures
 	 * @since JavaMail 1.4.1
 	 */
-	protected int simpleCommand(byte[] cmd) throws MessagingException {
+	public int simpleCommand(byte[] cmd) throws MessagingException {
 		assert Thread.holdsLock(this);
 		sendCommand(cmd);
 		return readServerResponse();
