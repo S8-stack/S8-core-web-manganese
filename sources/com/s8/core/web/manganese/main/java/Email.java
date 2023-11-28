@@ -5,14 +5,6 @@
  **/
 package com.s8.core.web.manganese.main.java;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.io.PrintStream;
-import java.net.Socket;
-import javax.net.ssl.*;
-import java.security.SecureRandom;
-import java.util.*;
-
 public class Email
 {
 
