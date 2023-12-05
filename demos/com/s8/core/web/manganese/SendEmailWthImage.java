@@ -24,21 +24,25 @@ public class SendEmailWthImage {
 
 
 	public static void main(String[] args) {
-		sendEmailTask();
+		//sendEmailTask();
 
-		/*
-		new SendEmailWthImage ("w3spoint99@gmail.com", "Test Email",
+		
+		new SendEmailWthImage ("convert.pierre@gmail.com", "Test Email",
 				"Hi, This is a test email with image.", "image.png");
-		 */
+		 
 	}
 
 
 
 	public SendEmailWthImage (String receiverEmail,
 			String subject, String messageText, String imagePath) {
+		
 		Properties props = new Properties();
-		props.put("mail.smtp.auth", "true");
 		props.put("mail.smtp.host", Credentials.HOST);
+		props.put("mail.smtp.auth", "true");
+		props.put("mail.smtp.port", "587");
+		props.put("mail.smtp.starttls.enable", "true"); //TLS
+		
 
 		try {
 
@@ -50,7 +54,8 @@ public class SendEmailWthImage {
 			});
 			Message emailMessage = new MimeMessage(session);
 
-			emailMessage.setFrom(new InternetAddress(Credentials.USERNAME));
+			//emailMessage.setFrom(new InternetAddress(Credentials.USERNAME));
+			emailMessage.setFrom(new InternetAddress(Credentials.USERNAME, "WebService master"));
 
 			emailMessage.setRecipients(Message.RecipientType.TO,
 					InternetAddress.parse(receiverEmail));
