@@ -7,12 +7,12 @@
 			<attribute name="module" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="libs/activation-1.1.1.jar">
+	<classpathentry kind="lib" path="libs/javax.mail-1.6.2.jar">
 		<attributes>
 			<attribute name="module" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="libs/javax.mail-1.6.2.jar">
+	<classpathentry kind="lib" path="/Users/pc/qx/git/S8-core-web-manganese/libs/javax.activation-1.1.1.jar">
 		<attributes>
 			<attribute name="module" value="true"/>
 		</attributes>
