@@ -25,7 +25,7 @@ import com.s8.core.io.xml.annotations.XML_Type;
 public class ManganeseWebService {
 
 
-	@XML_Type(name = "CarbonWebServiceConfiguration")
+	@XML_Type(name = "ManganeseWebServiceConfiguration")
 	public static class Config {
 
 		public String host;
@@ -46,7 +46,7 @@ public class ManganeseWebService {
 		@XML_SetElement(tag = "username")
 		public void setUsername(String username) { this.username = username; }
 
-		@XML_SetElement(tag = "username")
+		@XML_SetElement(tag = "password")
 		public void setPassword(String password) { this.password = password; }
 
 		@XML_SetElement(tag = "port")
@@ -162,12 +162,12 @@ public class ManganeseWebService {
 				Transport.send(mail.emailMessage);
 				
 				isTerminated = true;
-				request.onSent(Status.OK);
+				request.onSent(Status.OK, "Sent");
 			} 
 			catch (MessagingException e) {
 				if(nAttempts == maxNbAttempts) {
 					isTerminated = true;
-					request.onSent(Status.MAIL_REJECTED_BY_OUTGOING_SERVER);
+					request.onSent(Status.MAIL_REJECTED_BY_OUTGOING_SERVER, e.getMessage());
 				}
 				else {
 					disconnect();
@@ -176,7 +176,7 @@ public class ManganeseWebService {
 			}
 			catch (IOException e) {
 				isTerminated = true;
-				request.onSent(Status.INVALID_COMPOSING);
+				request.onSent(Status.INVALID_COMPOSING, e.getMessage());
 			}
 		}
 	}

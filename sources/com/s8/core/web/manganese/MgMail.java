@@ -28,9 +28,6 @@ public class MgMail implements S8Mail {
 	final Message emailMessage;
 
 
-	private String mailServerUsername;
-
-
 	public final static String DEFAULT_SENDER_NAME = "S8 Mail WebService";
 
 	private boolean isSenderDefined = false;
@@ -67,7 +64,7 @@ public class MgMail implements S8Mail {
 	public void setDisplayedSender(String name) throws IOException {
 		if(isLocked) { throw new IOException("Mail is already closed"); }
 		try {
-			emailMessage.setFrom(new InternetAddress(mailServerUsername, name));
+			emailMessage.setFrom(new InternetAddress(service.getMailServerUsername(), name));
 			this.isSenderDefined = true;
 		} 
 		catch (UnsupportedEncodingException | MessagingException e) {
@@ -127,7 +124,9 @@ public class MgMail implements S8Mail {
 
 		try {
 			if(!isSenderDefined) {
-				emailMessage.setFrom(new InternetAddress(mailServerUsername, service.getdefaultSenderDisplayedName()));
+				emailMessage.setFrom(new InternetAddress(
+						service.getMailServerUsername(), 
+						service.getdefaultSenderDisplayedName()));
 			}
 			
 			if(!isSubjectSet) {
