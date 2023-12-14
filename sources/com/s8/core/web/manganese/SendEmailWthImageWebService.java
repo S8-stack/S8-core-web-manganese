@@ -23,6 +23,10 @@ import javax.mail.internet.MimeMultipart;
 public class SendEmailWthImageWebService {
 
 
+	/**
+	 * 
+	 * @param args
+	 */
 	public static void main(String[] args) {
 		//sendEmailTask();
 
