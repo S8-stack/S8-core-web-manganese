@@ -20,7 +20,7 @@ import javax.mail.internet.MimeMultipart;
  * This class is used to send email with image.
  * @author w3spoint
  */
-public class SendEmailWthImage {
+public class SendEmailWthImageWebService {
 
 
 	public static void main(String[] args) {
@@ -34,7 +34,7 @@ public class SendEmailWthImage {
 
 
 
-	public SendEmailWthImage (String receiverEmail,
+	public SendEmailWthImageWebService(String receiverEmail,
 			String subject, String messageText, String imagePath) {
 		
 		Properties props = new Properties();
