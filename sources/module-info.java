@@ -8,6 +8,8 @@
 
 module com.s8.core.web.manganese {
 	
+	
+	exports com.s8.core.web.manganese;
 
 	
 	requires java.mail;
@@ -30,9 +32,9 @@ module com.s8.core.web.manganese {
 	 */
 	requires javax.activation;
 	
-	requires com.s8.core.io.xml;
-	requires com.s8.core.arch.silicon;
-	requires com.s8.api;
+	requires transitive com.s8.api;
+	requires transitive com.s8.core.io.xml;
+	requires transitive com.s8.core.arch.silicon;
 	
 	
 	

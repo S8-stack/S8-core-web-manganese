@@ -16,12 +16,16 @@ import javax.mail.internet.MimeMultipart;
 
 import com.s8.api.flow.mail.S8Mail;
 
+
+/**
+ * 
+ */
 public class MgMail implements S8Mail {
 
 
 	public final ManganeseWebService service;
 
-	public final Message emailMessage;
+	final Message emailMessage;
 
 
 	private String mailServerUsername;
@@ -47,7 +51,7 @@ public class MgMail implements S8Mail {
 	 * @throws UnsupportedEncodingException
 	 * @throws MessagingException
 	 */
-	public MgMail(ManganeseWebService service, Session session) 
+	MgMail(ManganeseWebService service, Session session) 
 			throws UnsupportedEncodingException, MessagingException {
 		super();
 
