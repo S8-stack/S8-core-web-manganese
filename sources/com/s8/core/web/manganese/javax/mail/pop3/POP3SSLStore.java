@@ -40,7 +40,8 @@
 
 package com.s8.core.web.manganese.javax.mail.pop3;
 
-import javax.mail.*;
+import com.s8.core.web.manganese.javax.mail.Session;
+import com.s8.core.web.manganese.javax.mail.URLName;
 
 /**
  * A POP3 Message Store using SSL.  Contains only one folder, "INBOX".

@@ -52,7 +52,8 @@ import javax.security.auth.callback.UnsupportedCallbackException;
 import javax.security.sasl.SaslClient;
 import javax.security.sasl.SaslException;
 
-import com.sun.mail.util.ASCIIUtility;
+import com.s8.core.web.manganese.javax.mail.util.ASCIIUtility;
+
 
 /**
  * JavaMail SASL client for OAUTH2.

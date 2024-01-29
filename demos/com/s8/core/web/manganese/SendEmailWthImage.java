@@ -2,19 +2,20 @@ package com.s8.core.web.manganese;
 
 import java.util.Properties;
 
-import javax.activation.DataHandler;
-import javax.activation.DataSource;
-import javax.activation.FileDataSource;
-import javax.mail.Authenticator;
-import javax.mail.Message;
-import javax.mail.Multipart;
-import javax.mail.PasswordAuthentication;
-import javax.mail.Session;
-import javax.mail.Transport;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeBodyPart;
-import javax.mail.internet.MimeMessage;
-import javax.mail.internet.MimeMultipart;
+import com.s8.core.web.manganese.javax.activation.DataHandler;
+import com.s8.core.web.manganese.javax.activation.DataSource;
+import com.s8.core.web.manganese.javax.activation.FileDataSource;
+import com.s8.core.web.manganese.javax.mail.Authenticator;
+import com.s8.core.web.manganese.javax.mail.Message;
+import com.s8.core.web.manganese.javax.mail.Multipart;
+import com.s8.core.web.manganese.javax.mail.PasswordAuthentication;
+import com.s8.core.web.manganese.javax.mail.Session;
+import com.s8.core.web.manganese.javax.mail.Transport;
+import com.s8.core.web.manganese.javax.mail.internet.InternetAddress;
+import com.s8.core.web.manganese.javax.mail.internet.MimeBodyPart;
+import com.s8.core.web.manganese.javax.mail.internet.MimeMessage;
+import com.s8.core.web.manganese.javax.mail.internet.MimeMultipart;
+
 
 /**
  * This class is used to send email with image.

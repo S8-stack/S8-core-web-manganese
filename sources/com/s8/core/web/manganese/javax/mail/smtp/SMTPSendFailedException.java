@@ -40,9 +40,9 @@
 
 package com.s8.core.web.manganese.javax.mail.smtp;
 
-import javax.mail.Address;
-import javax.mail.SendFailedException;
-import javax.mail.internet.InternetAddress;
+import com.s8.core.web.manganese.javax.mail.Address;
+import com.s8.core.web.manganese.javax.mail.SendFailedException;
+import com.s8.core.web.manganese.javax.mail.internet.InternetAddress;
 
 /**
  * This exception is thrown when the message cannot be sent. <p>

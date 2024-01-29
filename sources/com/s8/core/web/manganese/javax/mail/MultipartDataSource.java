@@ -40,7 +40,7 @@
 
 package com.s8.core.web.manganese.javax.mail;
 
-import javax.activation.DataSource;
+import com.s8.core.web.manganese.javax.activation.DataSource;
 
 /**
  * MultipartDataSource is a <code>DataSource</code> that contains body

@@ -40,8 +40,9 @@
 
 package com.s8.core.web.manganese.javax.mail.event;
 
-import java.util.*;
-import javax.mail.*;
+import com.s8.core.web.manganese.javax.mail.Address;
+import com.s8.core.web.manganese.javax.mail.Message;
+import com.s8.core.web.manganese.javax.mail.Transport;
 
 /**
  * This class models Transport events.

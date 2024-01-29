@@ -44,7 +44,8 @@ import java.io.PrintStream;
 import java.text.MessageFormat;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.mail.Session;
+
+import com.s8.core.web.manganese.javax.mail.Session;
 
 /**
  * A simplified logger used by JavaMail to handle logging to a

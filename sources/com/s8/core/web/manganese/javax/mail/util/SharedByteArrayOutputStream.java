@@ -40,10 +40,11 @@
 
 package com.s8.core.web.manganese.javax.mail.util;
 
-import java.io.InputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
 
-import javax.mail.util.SharedByteArrayInputStream;
+import com.s8.core.web.manganese.javax.mail.util2.SharedByteArrayInputStream;
+
 
 /**
  * A ByteArrayOutputStream that allows us to share the byte array

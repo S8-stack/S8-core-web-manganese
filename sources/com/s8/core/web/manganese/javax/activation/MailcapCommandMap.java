@@ -40,13 +40,20 @@
 
 package com.s8.core.web.manganese.javax.activation;
 
-import java.util.*;
-import java.io.*;
-import java.net.*;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
-import com.sun.activation.registries.MailcapFile;
-import com.sun.activation.registries.LogSupport;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+
+import com.s8.core.web.manganese.javax.activation.registries.LogSupport;
+import com.s8.core.web.manganese.javax.activation.registries.MailcapFile;
 
 /**
  * MailcapCommandMap extends the CommandMap

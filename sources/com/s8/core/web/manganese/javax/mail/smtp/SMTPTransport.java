@@ -40,29 +40,58 @@
 
 package com.s8.core.web.manganese.javax.mail.smtp;
 
-import java.io.*;
-import java.net.*;
-import java.util.*;
-import java.util.logging.Level;
-import java.lang.reflect.*;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.StringReader;
+import java.lang.reflect.Constructor;
+import java.net.InetAddress;
+import java.net.Socket;
+import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Hashtable;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Properties;
+import java.util.StringTokenizer;
+import java.util.logging.Level;
+
 import javax.net.ssl.SSLSocket;
 
-import javax.mail.*;
-import javax.mail.event.*;
-import javax.mail.internet.*;
+import com.s8.core.web.manganese.javax.mail.Address;
+import com.s8.core.web.manganese.javax.mail.AuthenticationFailedException;
+import com.s8.core.web.manganese.javax.mail.Message;
+import com.s8.core.web.manganese.javax.mail.MessagingException;
+import com.s8.core.web.manganese.javax.mail.SendFailedException;
+import com.s8.core.web.manganese.javax.mail.Session;
+import com.s8.core.web.manganese.javax.mail.Transport;
+import com.s8.core.web.manganese.javax.mail.URLName;
+import com.s8.core.web.manganese.javax.mail.auth.Ntlm;
+import com.s8.core.web.manganese.javax.mail.event.TransportEvent;
+import com.s8.core.web.manganese.javax.mail.internet.AddressException;
+import com.s8.core.web.manganese.javax.mail.internet.InternetAddress;
+import com.s8.core.web.manganese.javax.mail.internet.MimeMessage;
+import com.s8.core.web.manganese.javax.mail.internet.MimeMultipart;
+import com.s8.core.web.manganese.javax.mail.internet.MimePart;
+import com.s8.core.web.manganese.javax.mail.internet.ParseException;
+import com.s8.core.web.manganese.javax.mail.util.ASCIIUtility;
+import com.s8.core.web.manganese.javax.mail.util.BASE64EncoderStream;
+import com.s8.core.web.manganese.javax.mail.util.LineInputStream;
+import com.s8.core.web.manganese.javax.mail.util.MailConnectException;
+import com.s8.core.web.manganese.javax.mail.util.MailLogger;
+import com.s8.core.web.manganese.javax.mail.util.PropUtil;
+import com.s8.core.web.manganese.javax.mail.util.SocketConnectException;
+import com.s8.core.web.manganese.javax.mail.util.SocketFetcher;
+import com.s8.core.web.manganese.javax.mail.util.TraceInputStream;
+import com.s8.core.web.manganese.javax.mail.util.TraceOutputStream;
 
-import com.sun.mail.util.PropUtil;
-import com.sun.mail.util.MailLogger;
-import com.sun.mail.util.ASCIIUtility;
-import com.sun.mail.util.SocketFetcher;
-import com.sun.mail.util.MailConnectException;
-import com.sun.mail.util.SocketConnectException;
-import com.sun.mail.util.BASE64EncoderStream;
-import com.sun.mail.util.LineInputStream;
-import com.sun.mail.util.TraceInputStream;
-import com.sun.mail.util.TraceOutputStream;
-import com.sun.mail.auth.Ntlm;
 
 /**
  * This class implements the Transport abstract class using SMTP for
@@ -1027,6 +1056,8 @@ public class SMTPTransport extends Transport {
 	    b64os.write(passwd.getBytes(StandardCharsets.UTF_8));
 	    b64os.flush(); 	// complete the encoding
 
+	    b64os.close();
+	    
 	    return ASCIIUtility.toString(bos.toByteArray());
 	}
 

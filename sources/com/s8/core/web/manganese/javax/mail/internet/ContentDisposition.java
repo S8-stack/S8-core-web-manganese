@@ -40,10 +40,8 @@
 
 package com.s8.core.web.manganese.javax.mail.internet;
 
-import javax.mail.*;
-import java.util.*;
-import java.io.*;
-import com.sun.mail.util.PropUtil;
+
+import com.s8.core.web.manganese.javax.mail.util.PropUtil;
 
 /**
  * This class represents a MIME ContentDisposition value. It provides

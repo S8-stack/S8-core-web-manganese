@@ -40,9 +40,16 @@
 
 package com.s8.core.web.manganese.javax.mail.util2;
 
-import java.io.*;
-import javax.activation.*;
-import javax.mail.internet.*;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+
+import com.s8.core.web.manganese.javax.activation.DataSource;
+import com.s8.core.web.manganese.javax.mail.internet.ContentType;
+import com.s8.core.web.manganese.javax.mail.internet.MimeUtility;
+import com.s8.core.web.manganese.javax.mail.internet.ParseException;
+
 
 /**
  * A DataSource backed by a byte array.  The byte array may be

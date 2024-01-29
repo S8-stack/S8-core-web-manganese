@@ -40,12 +40,21 @@
 
 package com.s8.core.web.manganese.javax.mail.imap;
 
-import java.io.*;
-import javax.mail.*;
-import com.sun.mail.imap.protocol.*;
-import com.sun.mail.iap.*;
-import com.sun.mail.util.FolderClosedIOException;
-import com.sun.mail.util.MessageRemovedIOException;
+import java.io.IOException;
+import java.io.InputStream;
+
+import com.s8.core.web.manganese.javax.mail.Flags;
+import com.s8.core.web.manganese.javax.mail.Folder;
+import com.s8.core.web.manganese.javax.mail.FolderClosedException;
+import com.s8.core.web.manganese.javax.mail.MessagingException;
+import com.s8.core.web.manganese.javax.mail.iap.ByteArray;
+import com.s8.core.web.manganese.javax.mail.iap.ConnectionException;
+import com.s8.core.web.manganese.javax.mail.iap.ProtocolException;
+import com.s8.core.web.manganese.javax.mail.imap.protocol.BODY;
+import com.s8.core.web.manganese.javax.mail.imap.protocol.IMAPProtocol;
+import com.s8.core.web.manganese.javax.mail.util.FolderClosedIOException;
+import com.s8.core.web.manganese.javax.mail.util.MessageRemovedIOException;
+
 
 /**
  * This class implements an IMAP data stream.

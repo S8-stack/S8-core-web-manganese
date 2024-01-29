@@ -40,7 +40,7 @@
 
 package com.s8.core.web.manganese.javax.mail.imap;
 
-import javax.mail.Provider;
+import com.s8.core.web.manganese.javax.mail.Provider;
 
 /**
  * The IMAP SSL protocol provider.

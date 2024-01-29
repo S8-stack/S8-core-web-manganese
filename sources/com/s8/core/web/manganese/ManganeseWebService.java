@@ -4,16 +4,15 @@ import java.io.IOException;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import javax.mail.Authenticator;
-import javax.mail.MessagingException;
-import javax.mail.PasswordAuthentication;
-import javax.mail.Session;
-import javax.mail.Transport;
-
 import com.s8.api.flow.mail.SendMailS8Request;
 import com.s8.api.flow.mail.SendMailS8Request.Status;
 import com.s8.core.io.xml.annotations.XML_SetElement;
 import com.s8.core.io.xml.annotations.XML_Type;
+import com.s8.core.web.manganese.javax.mail.Authenticator;
+import com.s8.core.web.manganese.javax.mail.MessagingException;
+import com.s8.core.web.manganese.javax.mail.PasswordAuthentication;
+import com.s8.core.web.manganese.javax.mail.Session;
+import com.s8.core.web.manganese.javax.mail.Transport;
 
 
 

@@ -41,7 +41,7 @@
 
 package com.s8.core.web.manganese.javax.mail.pop3;
 
-import javax.mail.Provider;
+import com.s8.core.web.manganese.javax.mail.Provider;
 
 /**
  * The POP3 SSL protocol provider.

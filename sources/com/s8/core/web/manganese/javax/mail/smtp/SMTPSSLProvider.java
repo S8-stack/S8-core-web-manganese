@@ -41,7 +41,7 @@
 
 package com.s8.core.web.manganese.javax.mail.smtp;
 
-import javax.mail.Provider;
+import com.s8.core.web.manganese.javax.mail.Provider;
 
 /**
  * The SMTP SSL protocol provider.

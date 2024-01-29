@@ -40,8 +40,10 @@
 
 package com.s8.core.web.manganese.javax.mail.util2;
 
-import java.io.*;
-import javax.mail.internet.SharedInputStream;
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+
+import com.s8.core.web.manganese.javax.mail.internet.SharedInputStream;
 
 /**
  * A ByteArrayInputStream that implements the SharedInputStream interface,

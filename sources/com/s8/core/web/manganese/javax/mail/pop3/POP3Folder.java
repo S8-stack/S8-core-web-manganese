@@ -40,19 +40,28 @@
 
 package com.s8.core.web.manganese.javax.mail.pop3;
 
-import javax.mail.*;
-import javax.mail.event.*;
-import java.io.InputStream;
-import java.io.IOException;
+
 import java.io.EOFException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.lang.reflect.Constructor;
 import java.util.StringTokenizer;
 import java.util.logging.Level;
-import java.lang.reflect.Constructor;
 
-import com.sun.mail.util.LineInputStream;
-import com.sun.mail.util.MailLogger;
-import java.util.ArrayList;
-import java.util.List;
+import com.s8.core.web.manganese.javax.mail.AuthenticationFailedException;
+import com.s8.core.web.manganese.javax.mail.FetchProfile;
+import com.s8.core.web.manganese.javax.mail.Flags;
+import com.s8.core.web.manganese.javax.mail.Folder;
+import com.s8.core.web.manganese.javax.mail.FolderClosedException;
+import com.s8.core.web.manganese.javax.mail.FolderNotFoundException;
+import com.s8.core.web.manganese.javax.mail.Message;
+import com.s8.core.web.manganese.javax.mail.MessageRemovedException;
+import com.s8.core.web.manganese.javax.mail.MessagingException;
+import com.s8.core.web.manganese.javax.mail.MethodNotSupportedException;
+import com.s8.core.web.manganese.javax.mail.UIDFolder;
+import com.s8.core.web.manganese.javax.mail.event.ConnectionEvent;
+import com.s8.core.web.manganese.javax.mail.util.LineInputStream;
+import com.s8.core.web.manganese.javax.mail.util.MailLogger;
 
 /**
  * A POP3 Folder (can only be "INBOX").

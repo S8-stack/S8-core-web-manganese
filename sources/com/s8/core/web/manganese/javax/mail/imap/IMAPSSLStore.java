@@ -40,7 +40,8 @@
 
 package com.s8.core.web.manganese.javax.mail.imap;
 
-import javax.mail.*;
+import com.s8.core.web.manganese.javax.mail.Session;
+import com.s8.core.web.manganese.javax.mail.URLName;
 
 /**
  * This class provides access to an IMAP message store over SSL.

@@ -48,8 +48,8 @@ import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.Vector;
 
-import com.sun.activation.registries.LogSupport;
-import com.sun.activation.registries.MimeTypeFile;
+import com.s8.core.web.manganese.javax.activation.registries.LogSupport;
+import com.s8.core.web.manganese.javax.activation.registries.MimeTypeFile;
 
 /**
  * This class extends FileTypeMap and provides data typing of files

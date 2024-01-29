@@ -5,16 +5,16 @@ import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.mail.Message;
-import javax.mail.MessagingException;
-import javax.mail.Multipart;
-import javax.mail.Session;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeBodyPart;
-import javax.mail.internet.MimeMessage;
-import javax.mail.internet.MimeMultipart;
-
 import com.s8.api.flow.mail.S8Mail;
+
+import com.s8.core.web.manganese.javax.mail.Message;
+import com.s8.core.web.manganese.javax.mail.MessagingException;
+import com.s8.core.web.manganese.javax.mail.Multipart;
+import com.s8.core.web.manganese.javax.mail.Session;
+import com.s8.core.web.manganese.javax.mail.internet.InternetAddress;
+import com.s8.core.web.manganese.javax.mail.internet.MimeBodyPart;
+import com.s8.core.web.manganese.javax.mail.internet.MimeMessage;
+import com.s8.core.web.manganese.javax.mail.internet.MimeMultipart;
 
 
 /**

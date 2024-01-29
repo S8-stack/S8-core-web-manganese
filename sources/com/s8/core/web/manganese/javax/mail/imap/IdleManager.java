@@ -43,17 +43,25 @@ package com.s8.core.web.manganese.javax.mail.imap;
 import java.io.IOException;
 import java.io.InterruptedIOException;
 import java.net.Socket;
-import java.nio.*;
-import java.nio.channels.*;
-import java.util.*;
-import java.util.logging.*;
+import java.nio.channels.CancelledKeyException;
+import java.nio.channels.SelectableChannel;
+import java.nio.channels.SelectionKey;
+import java.nio.channels.Selector;
+import java.nio.channels.SocketChannel;
+import java.util.Iterator;
+import java.util.Queue;
+import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Executor;
+import java.util.logging.Level;
 
-import javax.mail.*;
+import com.s8.core.web.manganese.javax.mail.Folder;
+import com.s8.core.web.manganese.javax.mail.MessagingException;
+import com.s8.core.web.manganese.javax.mail.Session;
+import com.s8.core.web.manganese.javax.mail.util.MailLogger;
 
-import com.sun.mail.imap.protocol.IMAPProtocol;
-import com.sun.mail.util.MailLogger;
+
+
 
 /**
  * IdleManager uses the optional IMAP IDLE command

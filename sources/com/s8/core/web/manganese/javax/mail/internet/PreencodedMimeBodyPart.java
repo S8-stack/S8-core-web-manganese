@@ -40,11 +40,13 @@
 
 package com.s8.core.web.manganese.javax.mail.internet;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.util.Enumeration;
-import javax.mail.*;
 
-import com.sun.mail.util.LineOutputStream;
+import com.s8.core.web.manganese.javax.mail.MessagingException;
+import com.s8.core.web.manganese.javax.mail.util.LineOutputStream;
+
 
 /**
  * A MimeBodyPart that handles data that has already been encoded.

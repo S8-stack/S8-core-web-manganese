@@ -40,8 +40,8 @@
 
 package com.s8.core.web.manganese.javax.mail.smtp;
 
-import javax.mail.MessagingException;
-import javax.mail.internet.InternetAddress;
+import com.s8.core.web.manganese.javax.mail.MessagingException;
+import com.s8.core.web.manganese.javax.mail.internet.InternetAddress;
 
 /**
  * This exception is chained off a SendFailedException when the

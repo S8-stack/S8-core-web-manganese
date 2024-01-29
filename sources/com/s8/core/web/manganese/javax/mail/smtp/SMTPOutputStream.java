@@ -40,8 +40,12 @@
 
 package com.s8.core.web.manganese.javax.mail.smtp;
 
-import java.io.*;
-import com.sun.mail.util.CRLFOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+
+import com.s8.core.web.manganese.javax.mail.util.CRLFOutputStream;
+
+
 
 /**
  * In addition to converting lines into the canonical format,

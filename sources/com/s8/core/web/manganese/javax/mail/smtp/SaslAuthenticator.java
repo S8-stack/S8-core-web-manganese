@@ -40,7 +40,7 @@
 
 package com.s8.core.web.manganese.javax.mail.smtp;
 
-import javax.mail.MessagingException;
+import com.s8.core.web.manganese.javax.mail.MessagingException;
 
 /**
  * Interface to make it easier to call SMTPSaslAuthenticator.

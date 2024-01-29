@@ -40,9 +40,6 @@
 
 package com.s8.core.web.manganese.javax.mail.event;
 
-import java.util.*;
-import javax.mail.*;
-
 /**
  * This class models Connection events.
  *

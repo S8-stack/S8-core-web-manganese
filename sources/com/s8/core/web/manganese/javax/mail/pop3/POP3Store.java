@@ -40,23 +40,25 @@
 
 package com.s8.core.web.manganese.javax.mail.pop3;
 
-import java.util.Properties;
-import java.util.logging.Level;
-import java.lang.reflect.*;
-
-import javax.mail.*;
-import javax.mail.internet.*;
-import java.io.File;
-import java.io.PrintStream;
-import java.io.IOException;
 import java.io.EOFException;
+import java.io.File;
+import java.io.IOException;
+import java.lang.reflect.Constructor;
 import java.util.Collections;
 import java.util.Map;
+import java.util.logging.Level;
 
-import com.sun.mail.util.PropUtil;
-import com.sun.mail.util.MailLogger;
-import com.sun.mail.util.SocketConnectException;
-import com.sun.mail.util.MailConnectException;
+import com.s8.core.web.manganese.javax.mail.AuthenticationFailedException;
+import com.s8.core.web.manganese.javax.mail.Folder;
+import com.s8.core.web.manganese.javax.mail.MessagingException;
+import com.s8.core.web.manganese.javax.mail.Session;
+import com.s8.core.web.manganese.javax.mail.Store;
+import com.s8.core.web.manganese.javax.mail.URLName;
+import com.s8.core.web.manganese.javax.mail.util.MailConnectException;
+import com.s8.core.web.manganese.javax.mail.util.MailLogger;
+import com.s8.core.web.manganese.javax.mail.util.PropUtil;
+import com.s8.core.web.manganese.javax.mail.util.SocketConnectException;
+
 
 /**
  * A POP3 Message Store.  Contains only one folder, "INBOX".
@@ -160,7 +162,7 @@ public class POP3Store extends Store {
 		    messageClass = Class.forName(s);
 		}
 
-		Class<?>[] c = {javax.mail.Folder.class, int.class};
+		Class<?>[] c = { Folder.class, int.class };
 		messageConstructor = messageClass.getConstructor(c);
 	    } catch (Exception ex) {
 		logger.log(Level.CONFIG, "failed to load message class", ex);

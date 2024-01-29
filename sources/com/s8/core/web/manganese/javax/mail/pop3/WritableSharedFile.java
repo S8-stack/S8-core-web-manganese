@@ -43,7 +43,8 @@ package com.s8.core.web.manganese.javax.mail.pop3;
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
-import javax.mail.util.SharedFileInputStream;
+
+import com.s8.core.web.manganese.javax.mail.util2.SharedFileInputStream;
 
 /**
  * A subclass of SharedFileInputStream that also allows writing.

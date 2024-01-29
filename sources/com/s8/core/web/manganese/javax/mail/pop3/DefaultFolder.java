@@ -40,7 +40,11 @@
 
 package com.s8.core.web.manganese.javax.mail.pop3;
 
-import javax.mail.*;
+import com.s8.core.web.manganese.javax.mail.Flags;
+import com.s8.core.web.manganese.javax.mail.Folder;
+import com.s8.core.web.manganese.javax.mail.Message;
+import com.s8.core.web.manganese.javax.mail.MessagingException;
+import com.s8.core.web.manganese.javax.mail.MethodNotSupportedException;
 
 /**
  * The POP3 DefaultFolder.  Only contains the "INBOX" folder.

@@ -40,11 +40,15 @@
 
 package com.s8.core.web.manganese.javax.mail;
 
-import java.io.*;
-import java.net.*;
-import java.util.*;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.util.EventListener;
+import java.util.Vector;
 import java.util.concurrent.Executor;
-import javax.mail.event.*;
+
+import com.s8.core.web.manganese.javax.mail.event.ConnectionEvent;
+import com.s8.core.web.manganese.javax.mail.event.ConnectionListener;
+import com.s8.core.web.manganese.javax.mail.event.MailEvent;
 
 /**
  * An abstract class that contains the functionality

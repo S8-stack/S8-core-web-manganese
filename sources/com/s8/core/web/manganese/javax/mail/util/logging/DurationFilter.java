@@ -40,8 +40,8 @@
  */
 package com.s8.core.web.manganese.javax.mail.util.logging;
 
-import static com.sun.mail.util.logging.LogManagerProperties.fromLogManager;
-import java.util.logging.*;
+import java.util.logging.Filter;
+import java.util.logging.LogRecord;
 
 /**
  * A filter used to limit log records based on a maximum generation rate.
@@ -353,7 +353,7 @@ public class DurationFilter implements Filter {
     private long initLong(final String suffix) {
         long result = 0L;
         final String p = getClass().getName();
-        String value = fromLogManager(p.concat(suffix));
+        String value = LogManagerProperties.fromLogManager(p.concat(suffix));
         if (value != null && value.length() != 0) {
             value = value.trim();
             if (isTimeEntry(suffix, value)) {

@@ -40,8 +40,9 @@
 
 package com.s8.core.web.manganese.javax.mail.util;
 
-import java.util.*;
-import javax.mail.Session;
+import java.util.Properties;
+
+import com.s8.core.web.manganese.javax.mail.Session;
 
 /**
  * Utilities to make it easier to get property values.

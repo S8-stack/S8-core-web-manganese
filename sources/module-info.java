@@ -12,7 +12,6 @@ module com.s8.core.web.manganese {
 	exports com.s8.core.web.manganese;
 
 	
-	requires java.mail;
 	
 	/**
 	 * he warning is shown because the JAR you refer as jasperreprots module does
@@ -52,10 +51,14 @@ module com.s8.core.web.manganese {
 	requires transitive com.s8.core.arch.silicon;
 	
 	
+	requires java.base;
 	requires java.datatransfer;
 	requires java.logging;
 	requires java.desktop;
 	requires java.security.sasl;
+	
+	
+	
 	
 	
 	

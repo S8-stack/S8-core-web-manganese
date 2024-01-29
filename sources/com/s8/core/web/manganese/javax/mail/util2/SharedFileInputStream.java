@@ -40,8 +40,14 @@
 
 package com.s8.core.web.manganese.javax.mail.util2;
 
-import java.io.*;
-import javax.mail.internet.SharedInputStream;
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.RandomAccessFile;
+
+import com.s8.core.web.manganese.javax.mail.internet.SharedInputStream;
+
 
 /**
  * A <code>SharedFileInputStream</code> is a

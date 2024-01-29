@@ -40,7 +40,6 @@
  */
 package com.s8.core.web.manganese.javax.mail.util.logging;
 
-import static com.sun.mail.util.logging.LogManagerProperties.fromLogManager;
 import java.lang.reflect.UndeclaredThrowableException;
 import java.text.MessageFormat;
 import java.util.Comparator;
@@ -535,7 +534,7 @@ public class CollectorFormatter extends Formatter {
      * @throws NullPointerException if the given argument is null.
      */
     private String initFormat(final String p) {
-        String v = fromLogManager(p.concat(".format"));
+        String v = LogManagerProperties.fromLogManager(p.concat(".format"));
         if (v == null || v.length() == 0) {
             v = "{0}{1}{2}{4,choice,-1#|0#|0<... {4,number,integer} more}\n";
         }
@@ -553,7 +552,7 @@ public class CollectorFormatter extends Formatter {
      */
     private Formatter initFormatter(final String p) {
         Formatter f;
-        String v = fromLogManager(p.concat(".formatter"));
+        String v = LogManagerProperties.fromLogManager(p.concat(".formatter"));
         if (v != null && v.length() != 0) {
             if (!"null".equalsIgnoreCase(v)) {
                 try {
@@ -588,8 +587,8 @@ public class CollectorFormatter extends Formatter {
     @SuppressWarnings("unchecked")
     private Comparator<? super LogRecord> initComparator(final String p) {
         Comparator<? super LogRecord> c;
-        final String name = fromLogManager(p.concat(".comparator"));
-        final String reverse = fromLogManager(p.concat(".comparator.reverse"));
+        final String name = LogManagerProperties.fromLogManager(p.concat(".comparator"));
+        final String reverse = LogManagerProperties.fromLogManager(p.concat(".comparator.reverse"));
         try {
             if (name != null && name.length() != 0) {
                 if (!"null".equalsIgnoreCase(name)) {

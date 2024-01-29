@@ -40,10 +40,12 @@
 
 package com.s8.core.web.manganese.javax.mail;
 
-import java.io.*;
-import java.net.*;
-import java.util.*;
-import javax.mail.event.*;
+import java.util.Vector;
+
+import com.s8.core.web.manganese.javax.mail.event.FolderEvent;
+import com.s8.core.web.manganese.javax.mail.event.FolderListener;
+import com.s8.core.web.manganese.javax.mail.event.StoreEvent;
+import com.s8.core.web.manganese.javax.mail.event.StoreListener;
 
 /**
  * An abstract class that models a message store and its

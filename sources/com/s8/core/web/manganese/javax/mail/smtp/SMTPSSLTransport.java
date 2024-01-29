@@ -40,7 +40,8 @@
 
 package com.s8.core.web.manganese.javax.mail.smtp;
 
-import javax.mail.*;
+import com.s8.core.web.manganese.javax.mail.Session;
+import com.s8.core.web.manganese.javax.mail.URLName;
 
 /**
  * This class implements the Transport abstract class using SMTP

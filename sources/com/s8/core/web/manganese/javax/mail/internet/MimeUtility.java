@@ -1375,7 +1375,7 @@ public class MimeUtility {
 	    // Use this class's classloader to load the mapping file
 	    // XXX - we should use SecuritySupport, but it's in another package
 	    InputStream is = 
-		    javax.mail.internet.MimeUtility.class.getResourceAsStream(
+		    MimeUtility.class.getResourceAsStream(
 		    "/META-INF/javamail.charset.map");
 
 	    if (is != null) {

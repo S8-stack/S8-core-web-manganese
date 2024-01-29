@@ -41,8 +41,13 @@
 
 package com.s8.core.web.manganese.javax.mail.util.logging;
 
-import static com.sun.mail.util.logging.LogManagerProperties.fromLogManager;
-import java.io.*;
+
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
 import java.lang.reflect.InvocationTargetException;
 import java.net.InetAddress;
 import java.net.URLConnection;
@@ -50,13 +55,46 @@ import java.net.UnknownHostException;
 import java.nio.charset.Charset;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
-import java.util.*;
-import java.util.logging.*;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Properties;
+import java.util.ResourceBundle;
+import java.util.logging.ErrorManager;
+import java.util.logging.Filter;
 import java.util.logging.Formatter;
-import javax.activation.*;
-import javax.mail.*;
-import javax.mail.internet.*;
-import javax.mail.util.ByteArrayDataSource;
+import java.util.logging.Handler;
+import java.util.logging.Level;
+import java.util.logging.LogRecord;
+import java.util.logging.SimpleFormatter;
+
+import com.s8.core.web.manganese.javax.activation.DataHandler;
+import com.s8.core.web.manganese.javax.activation.DataSource;
+import com.s8.core.web.manganese.javax.activation.FileTypeMap;
+import com.s8.core.web.manganese.javax.activation.MimetypesFileTypeMap;
+import com.s8.core.web.manganese.javax.mail.Address;
+import com.s8.core.web.manganese.javax.mail.Authenticator;
+import com.s8.core.web.manganese.javax.mail.BodyPart;
+import com.s8.core.web.manganese.javax.mail.Message;
+import com.s8.core.web.manganese.javax.mail.MessageContext;
+import com.s8.core.web.manganese.javax.mail.MessagingException;
+import com.s8.core.web.manganese.javax.mail.Part;
+import com.s8.core.web.manganese.javax.mail.PasswordAuthentication;
+import com.s8.core.web.manganese.javax.mail.SendFailedException;
+import com.s8.core.web.manganese.javax.mail.Service;
+import com.s8.core.web.manganese.javax.mail.Session;
+import com.s8.core.web.manganese.javax.mail.Transport;
+import com.s8.core.web.manganese.javax.mail.internet.AddressException;
+import com.s8.core.web.manganese.javax.mail.internet.ContentType;
+import com.s8.core.web.manganese.javax.mail.internet.InternetAddress;
+import com.s8.core.web.manganese.javax.mail.internet.MimeBodyPart;
+import com.s8.core.web.manganese.javax.mail.internet.MimeMessage;
+import com.s8.core.web.manganese.javax.mail.internet.MimeMultipart;
+import com.s8.core.web.manganese.javax.mail.internet.MimePart;
+import com.s8.core.web.manganese.javax.mail.internet.MimeUtility;
+import com.s8.core.web.manganese.javax.mail.util2.ByteArrayDataSource;
 
 /**
  * <tt>Handler</tt> that formats log records as an email message.
@@ -2048,7 +2086,7 @@ public class MailHandler extends Handler {
         initAttachmentFilters(p);
         initAttachmentNames(p);
 
-        if (props == null && fromLogManager(p.concat(".verify")) != null) {
+        if (props == null && LogManagerProperties.fromLogManager(p.concat(".verify")) != null) {
             verifySettings(initSession());
         }
         intern(); //Show verify warnings first.
@@ -2245,7 +2283,7 @@ public class MailHandler extends Handler {
     private void initAttachmentFilters(final String p) {
         assert Thread.holdsLock(this);
         assert this.attachmentFormatters != null;
-        final String list = fromLogManager(p.concat(".attachment.filters"));
+        final String list = LogManagerProperties.fromLogManager(p.concat(".attachment.filters"));
         if (!isEmpty(list)) {
             final String[] names = list.split(",");
             Filter[] a = new Filter[names.length];
@@ -2281,7 +2319,7 @@ public class MailHandler extends Handler {
      */
     private void initAttachmentFormaters(final String p) {
         assert Thread.holdsLock(this);
-        final String list = fromLogManager(p.concat(".attachment.formatters"));
+        final String list = LogManagerProperties.fromLogManager(p.concat(".attachment.formatters"));
         if (!isEmpty(list)) {
             final Formatter[] a;
             final String[] names = list.split(",");
@@ -2330,7 +2368,7 @@ public class MailHandler extends Handler {
         assert Thread.holdsLock(this);
         assert this.attachmentFormatters != null;
 
-        final String list = fromLogManager(p.concat(".attachment.names"));
+        final String list = LogManagerProperties.fromLogManager(p.concat(".attachment.names"));
         if (!isEmpty(list)) {
             final String[] names = list.split(",");
             final Formatter[] a = new Formatter[names.length];
@@ -2374,7 +2412,7 @@ public class MailHandler extends Handler {
      */
     private void initAuthenticator(final String p) {
         assert Thread.holdsLock(this);
-        String name = fromLogManager(p.concat(".authenticator"));
+        String name = LogManagerProperties.fromLogManager(p.concat(".authenticator"));
         if (name != null && !"null".equalsIgnoreCase(name)) {
             if (name.length() != 0) {
                 try {
@@ -2403,7 +2441,7 @@ public class MailHandler extends Handler {
     private void initLevel(final String p) {
         assert Thread.holdsLock(this);
         try {
-            final String val = fromLogManager(p.concat(".level"));
+            final String val = LogManagerProperties.fromLogManager(p.concat(".level"));
             if (val != null) {
                 logLevel = Level.parse(val);
             } else {
@@ -2426,7 +2464,7 @@ public class MailHandler extends Handler {
     private void initFilter(final String p) {
         assert Thread.holdsLock(this);
         try {
-            String name = fromLogManager(p.concat(".filter"));
+            String name = LogManagerProperties.fromLogManager(p.concat(".filter"));
             if (hasValue(name)) {
                 filter = LogManagerProperties.newFilter(name);
             }
@@ -2447,7 +2485,7 @@ public class MailHandler extends Handler {
         assert Thread.holdsLock(this);
         final int DEFAULT_CAPACITY = 1000;
         try {
-            final String value = fromLogManager(p.concat(".capacity"));
+            final String value = LogManagerProperties.fromLogManager(p.concat(".capacity"));
             if (value != null) {
                 this.setCapacity0(Integer.parseInt(value));
             } else {
@@ -2476,7 +2514,7 @@ public class MailHandler extends Handler {
     private void initEncoding(final String p) {
         assert Thread.holdsLock(this);
         try {
-            String e = fromLogManager(p.concat(".encoding"));
+            String e = LogManagerProperties.fromLogManager(p.concat(".encoding"));
             if (e != null) {
                 setEncoding0(e);
             }
@@ -2516,7 +2554,7 @@ public class MailHandler extends Handler {
     private void initErrorManager(final String p) {
         assert Thread.holdsLock(this);
         try {
-            String name = fromLogManager(p.concat(".errorManager"));
+            String name = LogManagerProperties.fromLogManager(p.concat(".errorManager"));
             if (name != null) {
                 setErrorManager0(LogManagerProperties.newErrorManager(name));
             }
@@ -2536,7 +2574,7 @@ public class MailHandler extends Handler {
     private void initFormatter(final String p) {
         assert Thread.holdsLock(this);
         try {
-            String name = fromLogManager(p.concat(".formatter"));
+            String name = LogManagerProperties.fromLogManager(p.concat(".formatter"));
             if (hasValue(name)) {
                 final Formatter f
                         = LogManagerProperties.newFormatter(name);
@@ -2566,8 +2604,8 @@ public class MailHandler extends Handler {
     private void initComparator(final String p) {
         assert Thread.holdsLock(this);
         try {
-            String name = fromLogManager(p.concat(".comparator"));
-            String reverse = fromLogManager(p.concat(".comparator.reverse"));
+            String name = LogManagerProperties.fromLogManager(p.concat(".comparator"));
+            String reverse = LogManagerProperties.fromLogManager(p.concat(".comparator.reverse"));
             if (hasValue(name)) {
                 comparator = LogManagerProperties.newComparator(name);
                 if (Boolean.parseBoolean(reverse)) {
@@ -2596,7 +2634,7 @@ public class MailHandler extends Handler {
     private void initPushLevel(final String p) {
         assert Thread.holdsLock(this);
         try {
-            final String val = fromLogManager(p.concat(".pushLevel"));
+            final String val = LogManagerProperties.fromLogManager(p.concat(".pushLevel"));
             if (val != null) {
                 this.pushLevel = Level.parse(val);
             }
@@ -2618,7 +2656,7 @@ public class MailHandler extends Handler {
     private void initPushFilter(final String p) {
         assert Thread.holdsLock(this);
         try {
-            String name = fromLogManager(p.concat(".pushFilter"));
+            String name = LogManagerProperties.fromLogManager(p.concat(".pushFilter"));
             if (hasValue(name)) {
                 this.pushFilter = LogManagerProperties.newFilter(name);
             }
@@ -2637,7 +2675,7 @@ public class MailHandler extends Handler {
      */
     private void initSubject(final String p) {
         assert Thread.holdsLock(this);
-        String name = fromLogManager(p.concat(".subject"));
+        String name = LogManagerProperties.fromLogManager(p.concat(".subject"));
         if (name == null) { //Soft dependency on CollectorFormatter.
             name = "com.sun.mail.util.logging.CollectorFormatter";
         }

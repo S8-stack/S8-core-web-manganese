@@ -40,7 +40,6 @@
 
 package com.s8.core.web.manganese.javax.mail.imap;
 
-import com.sun.mail.iap.*;
 
 /**
  * Information from the APPENDUID response code

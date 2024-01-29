@@ -40,14 +40,28 @@
 
 package com.s8.core.web.manganese.javax.mail.pop3;
 
-import java.io.*;
+import java.io.BufferedOutputStream;
+import java.io.EOFException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.lang.ref.SoftReference;
 import java.util.Enumeration;
 import java.util.logging.Level;
-import java.lang.ref.SoftReference;
-import javax.mail.*;
-import javax.mail.internet.*;
-import javax.mail.event.*;
-import com.sun.mail.util.ReadableMime;
+
+import com.s8.core.web.manganese.javax.mail.Flags;
+import com.s8.core.web.manganese.javax.mail.Folder;
+import com.s8.core.web.manganese.javax.mail.FolderClosedException;
+import com.s8.core.web.manganese.javax.mail.Header;
+import com.s8.core.web.manganese.javax.mail.IllegalWriteException;
+import com.s8.core.web.manganese.javax.mail.MessageRemovedException;
+import com.s8.core.web.manganese.javax.mail.MessagingException;
+import com.s8.core.web.manganese.javax.mail.event.MessageChangedEvent;
+import com.s8.core.web.manganese.javax.mail.internet.InternetHeaders;
+import com.s8.core.web.manganese.javax.mail.internet.MimeMessage;
+import com.s8.core.web.manganese.javax.mail.internet.SharedInputStream;
+import com.s8.core.web.manganese.javax.mail.util.ReadableMime;
+
 
 /**
  * A POP3 Message.  Just like a MimeMessage except that

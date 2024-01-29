@@ -56,10 +56,11 @@ import com.s8.core.web.manganese.javax.mail.MessageContext;
 import com.s8.core.web.manganese.javax.mail.MessagingException;
 import com.s8.core.web.manganese.javax.mail.Multipart;
 import com.s8.core.web.manganese.javax.mail.MultipartDataSource;
-import com.sun.mail.util.ASCIIUtility;
-import com.sun.mail.util.LineInputStream;
-import com.sun.mail.util.LineOutputStream;
-import com.sun.mail.util.PropUtil;
+import com.s8.core.web.manganese.javax.mail.util.ASCIIUtility;
+import com.s8.core.web.manganese.javax.mail.util.LineInputStream;
+import com.s8.core.web.manganese.javax.mail.util.LineOutputStream;
+import com.s8.core.web.manganese.javax.mail.util.PropUtil;
+
 
 /**
  * The MimeMultipart class is an implementation of the abstract Multipart

@@ -40,8 +40,7 @@
 
 package com.s8.core.web.manganese.javax.mail.event;
 
-import java.util.*;
-import javax.mail.*;
+import com.s8.core.web.manganese.javax.mail.Store;
 
 /**
  * This class models notifications from the Store connection. These

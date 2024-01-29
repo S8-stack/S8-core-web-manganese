@@ -40,24 +40,35 @@
 
 package com.s8.core.web.manganese.javax.mail;
 
-import java.lang.reflect.*;
-import java.io.*;
-import java.net.*;
-import java.security.*;
-import java.util.Collections;
-import java.util.Hashtable;
-import java.util.Map;
-import java.util.HashMap;
-import java.util.List;
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.PrintStream;
+import java.lang.reflect.Constructor;
+import java.net.InetAddress;
+import java.net.URL;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
+import java.security.PrivilegedActionException;
+import java.security.PrivilegedExceptionAction;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Hashtable;
+import java.util.List;
+import java.util.Map;
 import java.util.Properties;
-import java.util.StringTokenizer;
 import java.util.ServiceLoader;
-import java.util.logging.Level;
+import java.util.StringTokenizer;
 import java.util.concurrent.Executor;
+import java.util.logging.Level;
 
-import com.sun.mail.util.LineInputStream;
-import com.sun.mail.util.MailLogger;
+import com.s8.core.web.manganese.javax.mail.util.LineInputStream;
+import com.s8.core.web.manganese.javax.mail.util.MailLogger;
+
 
 /**
  * The Session class represents a mail session and is not subclassed.
@@ -877,7 +888,7 @@ public final class Session {
 
 	// construct an instance of the class
 	try {
-	    Class<?>[] c = {javax.mail.Session.class, javax.mail.URLName.class};
+	    Class<?>[] c = {Session.class, URLName.class};
 	    Constructor<?> cons = serviceClass.getConstructor(c);
 
 	    Object[] o = {this, url};
