@@ -27,20 +27,26 @@ public class SendEmailWthImage {
 	public static void main(String[] args) {
 		//sendEmailTask();
 
+		MailServerCredentials credentials = NoReplyCredentials.create();
 		
-		new SendEmailWthImage ("convert.pierre@gmail.com", "Test Email",
-				"Hi, This is a test email with image.", "image.png");
+		/*
+		sendEmailWthImage(credentials, "convert.pierre@gmail.com", "Test Email",
+				"Hi, This is a test email with image.", "/Users/pc/qx/git/S8-core-web-manganese/image.png");
+				*/
+		
+		sendEmailTask(credentials);
 		 
 	}
 
 
 
 	
-	public SendEmailWthImage (String receiverEmail,
+	public static void sendEmailWthImage(MailServerCredentials credentials,
+			String receiverEmail,
 			String subject, String messageText, String imagePath) {
 		
 		Properties props = new Properties();
-		props.put("mail.smtp.host", FakeCredentials.HOST);
+		props.put("mail.smtp.host", credentials.host);
 		props.put("mail.smtp.auth", "true");
 		props.put("mail.smtp.port", "587");
 		props.put("mail.smtp.starttls.enable", "true"); //TLS
@@ -51,13 +57,13 @@ public class SendEmailWthImage {
 			Session session = Session.getInstance(props, new Authenticator() {
 				@Override
 				public PasswordAuthentication getPasswordAuthentication() {
-					return new PasswordAuthentication(FakeCredentials.USERNAME, FakeCredentials.PASSWORD);
+					return new PasswordAuthentication(credentials.username, credentials.password);
 				}
 			});
 			Message emailMessage = new MimeMessage(session);
 
 			//emailMessage.setFrom(new InternetAddress(Credentials.USERNAME));
-			emailMessage.setFrom(new InternetAddress(FakeCredentials.USERNAME, "WebService master"));
+			emailMessage.setFrom(new InternetAddress(credentials.username, "WebService master"));
 
 			emailMessage.setRecipients(Message.RecipientType.TO,
 					InternetAddress.parse(receiverEmail));
@@ -76,26 +82,27 @@ public class SendEmailWthImage {
 
 			System.out.println("Email send successfully.");
 		} catch (Exception e) {
+			e.printStackTrace();
 			System.err.println("Error in sending email.");
 		}
 	}
 
 
-	public static void sendEmailTask(){
+	public static void sendEmailTask(MailServerCredentials credentials){
 		try {
 
 			// Setup mail server
 			Properties props = new Properties();
-			props.put("mail.smtp.host", FakeCredentials.HOST);
+			props.put("mail.smtp.host", credentials.host);
 			props.put("mail.smtp.auth", "true");
 			props.put("mail.smtp.port", "587");
 			props.put("mail.smtp.starttls.enable", "true"); //TLS
 
 
 			// Get the Session object.// and pass
-			Session session = Session.getInstance(props, new javax.mail.Authenticator() {
+			Session session = Session.getInstance(props, new Authenticator() {
 				protected @Override PasswordAuthentication getPasswordAuthentication() {
-					return new PasswordAuthentication(FakeCredentials.USERNAME, FakeCredentials.PASSWORD);
+					return new PasswordAuthentication(credentials.username, credentials.password);
 				}
 			});
 
@@ -104,7 +111,7 @@ public class SendEmailWthImage {
 			MimeMessage message = new MimeMessage(session);
 
 			// Set From: header field of the header.
-			message.setFrom(new InternetAddress(FakeCredentials.USERNAME));
+			message.setFrom(new InternetAddress(credentials.username));
 
 			// Set To: header field of the header.
 			message.addRecipient(Message.RecipientType.TO, new InternetAddress("convert.pierre@gmail.com"));

@@ -43,7 +43,7 @@ public class SendEmailWthImageWebService {
 			String subject, String messageText, String imagePath) {
 		
 		Properties props = new Properties();
-		props.put("mail.smtp.host", FakeCredentials.HOST);
+		props.put("mail.smtp.host", MailServerCredentials.HOST);
 		props.put("mail.smtp.auth", "true");
 		props.put("mail.smtp.port", "587");
 		props.put("mail.smtp.starttls.enable", "true"); //TLS
@@ -54,13 +54,13 @@ public class SendEmailWthImageWebService {
 			Session session = Session.getInstance(props, new Authenticator() {
 				@Override
 				public PasswordAuthentication getPasswordAuthentication() {
-					return new PasswordAuthentication(FakeCredentials.USERNAME, FakeCredentials.PASSWORD);
+					return new PasswordAuthentication(MailServerCredentials.USERNAME, MailServerCredentials.PASSWORD);
 				}
 			});
 			Message emailMessage = new MimeMessage(session);
 
 			//emailMessage.setFrom(new InternetAddress(Credentials.USERNAME));
-			emailMessage.setFrom(new InternetAddress(FakeCredentials.USERNAME, "WebService master"));
+			emailMessage.setFrom(new InternetAddress(MailServerCredentials.USERNAME, "WebService master"));
 
 			emailMessage.setRecipients(Message.RecipientType.TO,
 					InternetAddress.parse(receiverEmail));
@@ -89,7 +89,7 @@ public class SendEmailWthImageWebService {
 
 			// Setup mail server
 			Properties props = new Properties();
-			props.put("mail.smtp.host", FakeCredentials.HOST);
+			props.put("mail.smtp.host", MailServerCredentials.HOST);
 			props.put("mail.smtp.auth", "true");
 			props.put("mail.smtp.port", "587");
 			props.put("mail.smtp.starttls.enable", "true"); //TLS
@@ -98,7 +98,7 @@ public class SendEmailWthImageWebService {
 			// Get the Session object.// and pass
 			Session session = Session.getInstance(props, new Authenticator() {
 				protected @Override PasswordAuthentication getPasswordAuthentication() {
-					return new PasswordAuthentication(FakeCredentials.USERNAME, FakeCredentials.PASSWORD);
+					return new PasswordAuthentication(MailServerCredentials.USERNAME, MailServerCredentials.PASSWORD);
 				}
 			});
 
@@ -107,7 +107,7 @@ public class SendEmailWthImageWebService {
 			MimeMessage message = new MimeMessage(session);
 
 			// Set From: header field of the header.
-			message.setFrom(new InternetAddress(FakeCredentials.USERNAME));
+			message.setFrom(new InternetAddress(MailServerCredentials.USERNAME));
 
 			// Set To: header field of the header.
 			message.addRecipient(Message.RecipientType.TO, new InternetAddress("convert.pierre@gmail.com"));
