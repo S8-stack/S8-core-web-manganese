@@ -74,6 +74,7 @@ import com.s8.core.web.manganese.javax.mail.util.MessageRemovedIOException;
 import com.s8.core.web.manganese.javax.mail.util.MimeUtil;
 import com.s8.core.web.manganese.javax.mail.util.PropUtil;
 import com.s8.core.web.manganese.mime.MIME_Type;
+import com.s8.core.web.manganese.settings.MgContentEncoding;
 
 
 /**
@@ -864,7 +865,7 @@ public class MimeBodyPart extends BodyPart implements MimePart {
 	public void attachFile(File file) throws IOException, MessagingException {
 		FileDataSource fds = new FileDataSource(file);
 		String type = MIME_Type.fromExtension(file.getName());
-		this.setDataHandler(new DataHandler(MailDataContentHandler.create(type), fds));
+		this.setDataHandler(new DataHandler(type, MailDataContentHandler.create(type), fds));
 		this.setFileName(fds.getName());
 		this.setDisposition(ATTACHMENT);
 	}
@@ -905,7 +906,8 @@ public class MimeBodyPart extends BodyPart implements MimePart {
 	 */
 	public void attachFile(File file, String contentType, String encoding) throws IOException, MessagingException {
 		DataSource fds = new EncodedFileDataSource(file, contentType, encoding);
-		this.setDataHandler(new DataHandler(MailDataContentHandler.create(contentType), fds));
+		String type = MIME_Type.fromExtension(file.getName());
+		this.setDataHandler(new DataHandler(type, MailDataContentHandler.create(contentType), fds));
 		this.setFileName(fds.getName());
 		this.setDisposition(ATTACHMENT);
 	}
@@ -1481,10 +1483,6 @@ public class MimeBodyPart extends BodyPart implements MimePart {
 		return s;
 	}
 
-	static void setEncoding(MimePart part, String encoding)
-			throws MessagingException {
-		part.setHeader("Content-Transfer-Encoding", encoding);
-	}
 
 	/**
 	 * Restrict the encoding to values allowed for the
@@ -1588,7 +1586,7 @@ public class MimeBodyPart extends BodyPart implements MimePart {
 					// original has no encoding we'll consider reencoding it
 					String enc = mpart.getEncoding();
 					if (enc != null) {
-						setEncoding(part, enc);
+						part.setEncoding(enc);
 						return;
 					}
 				} else
@@ -1599,7 +1597,7 @@ public class MimeBodyPart extends BodyPart implements MimePart {
 			// already have one
 			if (!composite) {	// not allowed on composite parts
 				if (part.getHeader("Content-Transfer-Encoding") == null)
-					setEncoding(part, MimeUtility.getEncoding(dh));
+					part.setEncoding(MgContentEncoding.get(dh.MIME_type));
 
 				if (needCTHeader && setDefaultTextCharset &&
 						cType.match("text/*") &&

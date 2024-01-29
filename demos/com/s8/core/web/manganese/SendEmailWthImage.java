@@ -76,8 +76,8 @@ public class SendEmailWthImage {
 			
 			MimeBodyPart messageBodyPart2 = new MimeBodyPart();
 			DataSource source = new FileDataSource(imagePath);
-			DataContentHandler dch = MailDataContentHandler.create("image/jpeg");
-			messageBodyPart2.setDataHandler(new DataHandler(dch, source));
+			DataContentHandler dch = MailDataContentHandler.create("image/png");
+			messageBodyPart2.setDataHandler(new DataHandler("image/png", dch, source));
 
 			messageBodyPart2.setHeader("Content-ID", "logo1.png");      
 			//messageBodyPart2.setHeader("name", "logo1.png");      

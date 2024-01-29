@@ -1,10 +1,10 @@
-package com.s8.core.web.manganese.javax.mail.handlers;
+package com.s8.core.web.manganese.settings;
 
-import com.s8.core.web.manganese.javax.activation.DataContentHandler;
 import com.s8.core.web.manganese.javax.mail.MessagingException;
 
-public class MailDataContentHandler {
-
+public class MgContentEncoding {
+	
+	
 
 	/**
 	 * 
@@ -20,39 +20,39 @@ public class MailDataContentHandler {
 	 * @param type MIME_Type
 	 * @return
 	 */
-	public static DataContentHandler create(String type) throws MessagingException {
+	public static String get(String type) throws MessagingException {
 
 		/* <text> */
 		if(type.startsWith("text/")) {
 			if(type.startsWith("text/plain")) {
-				return new text_plain();
+				return "8bit";
 			}
 			else if(type.startsWith("text/html")) {
-				return new text_html();
+				return "8bit";
 			}
 			else if(type.startsWith("text/xml")) {
-				return new text_xml();
+				return "8bit";
 			}
 			else {
 				throw new MessagingException("Unsupported MIME type: "+type);
 			}
 		}
 		else if(type.startsWith("multipart/")) {
-			return new multipart_mixed();
+			throw new MessagingException("Content encoding has no meaning for multipart");
 		}
 		else if(type.startsWith("message/rfc822")) {
-			return new message_rfc822();
+			return "8bit";
 		}
 		/* <image> */
 		else if(type.startsWith("image/")) {
 			if(type.startsWith("image/gif")) {
-				return new image_gif();
+				return "base64";
 			}
 			else if(type.startsWith("image/jpeg")) {
-				return new image_jpeg();
+				return "base64";
 			}
 			else if(type.startsWith("image/png")) {
-				return new image_jpeg();
+				return "base64";
 			}
 			else {
 				throw new MessagingException("Unsupported MIME type: "+type);
@@ -62,7 +62,5 @@ public class MailDataContentHandler {
 			throw new MessagingException("Unsupported MIME type: "+type);
 		}
 	}
-
-
 
 }

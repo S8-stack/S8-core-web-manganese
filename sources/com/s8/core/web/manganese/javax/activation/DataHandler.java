@@ -108,7 +108,17 @@ public class DataHandler implements Transferable {
 	private static final DataFlavor emptyFlavors[] = new DataFlavor[0];
 	private DataFlavor transferFlavors[] = emptyFlavors;
 
-	// our DataContentHandler
+	
+	
+	/**
+	 * Our MIME_Type
+	 */
+	public final String MIME_type;
+	
+	
+	/**
+	 *  our DataContentHandler
+	 */
 	public final DataContentHandler dataContentHandler;
 
 	// our DataContentHandlerFactory
@@ -122,8 +132,9 @@ public class DataHandler implements Transferable {
 	 *
 	 * @param ds	the DataSource
 	 */
-	public DataHandler(DataContentHandler dataContentHandler, DataSource ds) {
+	public DataHandler(String type, DataContentHandler dataContentHandler, DataSource ds) {
 		// save a reference to the incoming DS
+		this.MIME_type = type;
 		this.dataContentHandler = dataContentHandler;
 		dataSource = ds;
 	}
@@ -138,6 +149,7 @@ public class DataHandler implements Transferable {
 	 * @param mimeType	the MIME type of the object
 	 */
 	public DataHandler(DataContentHandler dataContentHandler, Object obj, String mimeType) {
+		this.MIME_type = mimeType;
 		this.dataContentHandler = dataContentHandler;
 		object = obj;
 		objectMimeType = mimeType;
@@ -150,7 +162,8 @@ public class DataHandler implements Transferable {
 	 *
 	 * @param url	a URL object
 	 */
-	public DataHandler(DataContentHandler dataContentHandler, URL url) {
+	public DataHandler(String type, DataContentHandler dataContentHandler, URL url) {
+		this.MIME_type = type;
 		this.dataContentHandler = dataContentHandler;
 		dataSource = new URLDataSource(url);
 	}
@@ -214,12 +227,10 @@ public class DataHandler implements Transferable {
 	 * @return	the MIME type
 	 */
 	public String getContentType() {
-		if (dataSource != null) // data source case
-			return dataSource.getContentType();
-		else
-			return objectMimeType; // obj/type case
+		return MIME_type; // obj/type case
 	}
 
+	
 	/**
 	 * Get the InputStream for this object. <p>
 	 *

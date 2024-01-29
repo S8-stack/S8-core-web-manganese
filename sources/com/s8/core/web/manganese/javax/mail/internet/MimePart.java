@@ -247,4 +247,15 @@ public interface MimePart extends Part {
      */
     public void setText(String text, String charset, String subtype)
                         throws MessagingException;
+    
+    
+
+    /**
+     * 
+     * @param encoding
+     * @throws MessagingException
+     */
+	public default void setEncoding(String encoding) throws MessagingException {
+		setHeader("Content-Transfer-Encoding", encoding);
+	}
 }
