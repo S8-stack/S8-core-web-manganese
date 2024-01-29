@@ -30,11 +30,32 @@ module com.s8.core.web.manganese {
 	 * Automatic-Module-Name. Most likely you are using an outdated dependency built
 	 * for Java 8 or lower.
 	 */
-	requires javax.activation;
+	//requires javax.activation;
+	
+	
+	
+	/*
+	import com.sun.mail.smtp.SMTPTransport;
+	import com.sun.mail.util.BASE64EncoderStream;
+
+	import javax.mail.Message;
+	import javax.mail.Session;
+	import javax.mail.internet.InternetAddress;
+	import javax.mail.internet.MimeMessage;
+	import java.util.Properties;
+	import java.util.logging.Level;
+	import java.util.logging.Logger;
+	*/
 	
 	requires transitive com.s8.api;
 	requires transitive com.s8.core.io.xml;
 	requires transitive com.s8.core.arch.silicon;
+	
+	
+	requires java.datatransfer;
+	requires java.logging;
+	requires java.desktop;
+	requires java.security.sasl;
 	
 	
 	
