@@ -2,6 +2,7 @@ package com.s8.core.web.manganese;
 
 import java.util.Properties;
 
+import com.s8.core.web.manganese.javax.activation.DataContentHandler;
 import com.s8.core.web.manganese.javax.activation.DataHandler;
 import com.s8.core.web.manganese.javax.activation.DataSource;
 import com.s8.core.web.manganese.javax.activation.FileDataSource;
@@ -11,6 +12,7 @@ import com.s8.core.web.manganese.javax.mail.Multipart;
 import com.s8.core.web.manganese.javax.mail.PasswordAuthentication;
 import com.s8.core.web.manganese.javax.mail.Session;
 import com.s8.core.web.manganese.javax.mail.Transport;
+import com.s8.core.web.manganese.javax.mail.handlers.MailDataContentHandler;
 import com.s8.core.web.manganese.javax.mail.internet.InternetAddress;
 import com.s8.core.web.manganese.javax.mail.internet.MimeBodyPart;
 import com.s8.core.web.manganese.javax.mail.internet.MimeMessage;
@@ -29,12 +31,12 @@ public class SendEmailWthImage {
 
 		MailServerCredentials credentials = NoReplyCredentials.create();
 		
-		/*
+		
 		sendEmailWthImage(credentials, "convert.pierre@gmail.com", "Test Email",
 				"Hi, This is a test email with image.", "/Users/pc/qx/git/S8-core-web-manganese/image.png");
-				*/
+				
 		
-		sendEmailTask(credentials);
+		//sendEmailTask(credentials);
 		 
 	}
 
@@ -70,9 +72,18 @@ public class SendEmailWthImage {
 			emailMessage.setSubject(subject);
 			MimeBodyPart messageBodyPart1 = new MimeBodyPart();
 			messageBodyPart1.setText(messageText);
+			
+			
 			MimeBodyPart messageBodyPart2 = new MimeBodyPart();
 			DataSource source = new FileDataSource(imagePath);
-			messageBodyPart2.setDataHandler(new DataHandler(source));
+			DataContentHandler dch = MailDataContentHandler.create("image/jpeg");
+			messageBodyPart2.setDataHandler(new DataHandler(dch, source));
+
+			messageBodyPart2.setHeader("Content-ID", "logo1.png");      
+			//messageBodyPart2.setHeader("name", "logo1.png");      
+// add image to the multipart
+			messageBodyPart2.setDisposition(MimeBodyPart.INLINE);
+			
 			Multipart multipart = new MimeMultipart();
 			multipart.addBodyPart(messageBodyPart1);
 			multipart.addBodyPart(messageBodyPart2);

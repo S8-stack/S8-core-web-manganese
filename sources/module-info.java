@@ -10,6 +10,7 @@ module com.s8.core.web.manganese {
 	
 	
 	exports com.s8.core.web.manganese;
+	exports com.s8.core.web.manganese.mime;
 
 	
 	
