@@ -84,8 +84,9 @@ public class MgMailGenerator {
 		builder.append(BODY_OPENING);
 
 		CSS_Style wrapperStyle = base.CSS_getClass(wrapperClassname).toStyle();
-		builder.append("\n<div>");
-		builder.append("\n<table style=\"" + wrapperStyle.getInline() + "\">");
+		
+		builder.append("\n<div style=\"" + wrapperStyle.getInline() + "\">");
+		builder.append("\n<table>");
 
 		elements.forEach(element -> element.compose(builder));
 

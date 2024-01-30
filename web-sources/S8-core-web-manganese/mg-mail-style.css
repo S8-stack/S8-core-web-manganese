@@ -75,12 +75,17 @@ body {
     padding: 12px 36px 12px 36px;
     background-color: rgb(236, 236, 236);
     border-radius: 8px;
-    border: 1px solid #c8c8c8;
+    border-width: 1px;
+    border-style: solid;
+    border-color: rgb(200, 200, 200);
     font-family: sans-serif, Helvetica, Arial;
     font-size: 16px;
-    color: rgb(87 93 215);
+    color: rgb(87,93, 215);
     letter-spacing: normal;
     font-weight: 600;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+}
+
+
+.mg-code-wrapper2 {
+    color: rgb(87, 93, 215);
 }

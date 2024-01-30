@@ -35,8 +35,11 @@ public class HTML_Code extends HTML_Element {
 		builder.append("\n<span style=\"");
 		builder.append(style.getInline());
 		builder.append("\">");
+		
 		builder.append(text);
-		builder.append("\n</span>");
+		
+		builder.append("</span>");
+		
 		builder.append("\n<td><tr>");
 	}
 

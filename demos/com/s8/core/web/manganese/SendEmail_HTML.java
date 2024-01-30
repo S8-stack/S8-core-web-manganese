@@ -85,7 +85,7 @@ public class SendEmail_HTML {
 			mailGenerator.h1(".mg-h1", "Hello dear AlphaVentor user!");
 			mailGenerator.h2(".mg-h2", "Welcome to a world of designs");
 			mailGenerator.p(".mg-p", "Your code to validate the creation of your account is just below:");
-			mailGenerator.addCode(".mg-code-wrapper", "9787987");
+			mailGenerator.addCode(".mg-code-wrapper", "trpoekpokpok");
 			mailGenerator.p(".mg-p", "If you're not the initiator of this, please report to pierre.convert@alphaventor.com");
 			
 			String content = mailGenerator.generate();
