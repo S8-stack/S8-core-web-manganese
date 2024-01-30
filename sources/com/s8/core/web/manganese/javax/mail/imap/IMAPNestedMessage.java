@@ -58,6 +58,7 @@ import com.s8.core.web.manganese.javax.mail.imap.protocol.IMAPProtocol;
  */
 
 public class IMAPNestedMessage extends IMAPMessage {
+	
     private IMAPMessage msg; // the enclosure of this nested message
 
     /**

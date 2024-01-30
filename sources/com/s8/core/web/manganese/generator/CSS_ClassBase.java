@@ -1,0 +1,118 @@
+package com.s8.core.web.manganese.generator;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+public class CSS_ClassBase {
+	
+	
+	
+	private final Map<String, CSS_Class> classes = new HashMap<>();
+
+	
+	public CSS_ClassBase() {
+		super();
+	}
+	
+	
+	public void DEBUG_print() {
+		classes.forEach((name, style) -> { System.out.println("style: "+name+" = "+style.serial); });
+	}
+	
+	
+	
+	public CSS_Class CSS_getClass(String className) {
+		return classes.get(className);
+	}
+	
+	
+	/**
+	 * 
+	 */
+	public final static String CLASS_REGEX = "(\\.?[\\w\\-]+) *[{](.*?)[}]";
+	
+	public final static String PROPERTY_REGEX = " *([\\w\\-]+) *: *([\\w\\- \\(\\),]+);";
+
+
+	/**
+	 * 
+	 * @param file
+	 */
+	public synchronized void parseString(String file) {
+		
+		Pattern pattern = Pattern.compile(CLASS_REGEX);
+		Pattern pattern2 = Pattern.compile(PROPERTY_REGEX);
+		
+		Matcher classMatcher = pattern.matcher(file);
+
+		boolean hasClass = classMatcher.find();
+		while(hasClass) {
+
+			String className = classMatcher.group(1);
+			String classProperties = classMatcher.group(2);
+			
+			List<CSS_Property> properties = new ArrayList<>();
+			
+			
+			Matcher propertyMatcher = pattern2.matcher(classProperties);
+			boolean hasProperty = propertyMatcher.find();
+			while(hasProperty) {
+			
+				String propertyName = propertyMatcher.group(1);
+				String propertyValue = propertyMatcher.group(2);
+				properties.add(new CSS_Property(propertyName, propertyValue));
+				
+				hasProperty = propertyMatcher.find();
+			}
+			
+			/* build array */
+			int nProperties = properties.size();
+			CSS_Property[] props = new CSS_Property[nProperties];
+			for(int i=0; i<nProperties; i++) { props[i] = properties.get(i); }
+			
+			classes.put(className, new CSS_Class(className, props));
+			
+			hasClass = classMatcher.find();
+		}
+	}
+
+	
+	public synchronized void parseFile(String pathname) {
+		parseString(readFile(pathname));
+	}
+	
+	
+	
+	
+	/**
+	 * UTF8
+	 * @param pathname
+	 * @return
+	 */
+	public static String readFile(String pathname) {
+		StringBuilder builder = new StringBuilder();
+		Path path = Paths.get(pathname);
+		try(BufferedReader reader = Files.newBufferedReader(path, StandardCharsets.UTF_8)){
+			String line = null;
+			while((line = reader.readLine()) != null){ //while there is content on the current line
+				builder.append(line.strip());
+			}
+		}catch(IOException ex){
+			ex.printStackTrace(); //handle an exception here
+		}
+		return builder.toString();
+	}
+
+	
+	
+}

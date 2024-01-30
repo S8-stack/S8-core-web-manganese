@@ -63,9 +63,6 @@ module com.s8.core.web.manganese {
 	requires java.desktop;
 	requires java.security.sasl;
 	
-	
-	
-	
-	
+
 	
 }

@@ -1592,10 +1592,8 @@ public class MimeMessage extends Message implements MimePart {
 		if (o instanceof Multipart)
 			setContent((Multipart)o);
 		else {
-			MIME_Type mt = MIME_Type.parse(type);
-			if(mt == null) { throw new MessagingException("MIME type is not supported: "+type); }
-			DataContentHandler dch = MailDataContentHandler.forType(mt);
-			setDataHandler(new DataHandler(dch, o, type));
+			DataContentHandler dch = MailDataContentHandler.create(type);
+			setDataHandler(new DataHandler(type, dch, o));
 		}
 	}
 
@@ -1672,7 +1670,7 @@ public class MimeMessage extends Message implements MimePart {
 	 */
 	@Override
 	public void setContent(Multipart mp) throws MessagingException {
-		setDataHandler(new DataHandler(MailDataContentHandler.create("multipart/*"), mp, mp.getContentType()));
+		setDataHandler(new DataHandler(mp.getContentType(), MailDataContentHandler.create("multipart/*"), mp));
 		mp.setParent(this);
 	}
 
@@ -2303,7 +2301,7 @@ public class MimeMessage extends Message implements MimePart {
 
 		if (cachedContent != null) {
 			String mt = getContentType();
-			dh = new DataHandler(MailDataContentHandler.create(mt), cachedContent, mt);
+			dh = new DataHandler(mt, MailDataContentHandler.create(mt), cachedContent);
 			cachedContent = null;
 			content = null;
 			if (contentStream != null) {

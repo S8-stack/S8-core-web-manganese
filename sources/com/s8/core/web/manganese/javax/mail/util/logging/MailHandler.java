@@ -86,6 +86,7 @@ import com.s8.core.web.manganese.javax.mail.SendFailedException;
 import com.s8.core.web.manganese.javax.mail.Service;
 import com.s8.core.web.manganese.javax.mail.Session;
 import com.s8.core.web.manganese.javax.mail.Transport;
+import com.s8.core.web.manganese.javax.mail.handlers.MailDataContentHandler;
 import com.s8.core.web.manganese.javax.mail.internet.AddressException;
 import com.s8.core.web.manganese.javax.mail.internet.ContentType;
 import com.s8.core.web.manganese.javax.mail.internet.InternetAddress;
@@ -1870,7 +1871,7 @@ public class MailHandler extends Handler {
             type = contentWithEncoding(type, charset);
             try {
                 DataSource source = new ByteArrayDataSource(buf.toString(), type);
-                part.setDataHandler(new DataHandler(source));
+                part.setDataHandler(new DataHandler(type, MailDataContentHandler.create(type), source));
             } catch (final IOException IOE) {
                 reportError(IOE.getMessage(), IOE, ErrorManager.FORMAT_FAILURE);
                 part.setText(buf.toString(), charset);

@@ -148,7 +148,7 @@ public class DataHandler implements Transferable {
 	 * @param obj	the Java Object
 	 * @param mimeType	the MIME type of the object
 	 */
-	public DataHandler(DataContentHandler dataContentHandler, Object obj, String mimeType) {
+	public DataHandler(String mimeType, DataContentHandler dataContentHandler, Object obj) {
 		this.MIME_type = mimeType;
 		this.dataContentHandler = dataContentHandler;
 		object = obj;
@@ -282,6 +282,7 @@ public class DataHandler implements Transferable {
 			// can't because it is in another thread!!! ARG!
 			//
 			final PipedOutputStream pos = new PipedOutputStream();
+			@SuppressWarnings("resource")
 			PipedInputStream pin = new PipedInputStream(pos);
 			new Thread(
 					new Runnable() {

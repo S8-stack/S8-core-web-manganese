@@ -137,7 +137,7 @@ public class IMAPSaslAuthenticator implements SaslAuthenticator {
 			PasswordCallback pcb = (PasswordCallback)callbacks[i];
 			pcb.setPassword(p.toCharArray());
 		    } else if (callbacks[i] instanceof RealmCallback) {
-			RealmCallback rcb = (RealmCallback)callbacks[i];
+			RealmCallback rcb = (RealmCallback) callbacks[i];
 			rcb.setText(realm != null ?
 				    realm : rcb.getDefaultText());
 		    } else if (callbacks[i] instanceof RealmChoiceCallback) {

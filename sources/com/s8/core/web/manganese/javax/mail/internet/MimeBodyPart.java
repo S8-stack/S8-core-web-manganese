@@ -769,7 +769,7 @@ public class MimeBodyPart extends BodyPart implements MimePart {
 			setContent((Multipart)o);
 		} 
 		else {
-			setDataHandler(new DataHandler(MailDataContentHandler.create(type), o, type));
+			setDataHandler(new DataHandler(type, MailDataContentHandler.create(type), o));
 		}
 	}
 
@@ -845,7 +845,7 @@ public class MimeBodyPart extends BodyPart implements MimePart {
 	 */
 	@Override
 	public void setContent(Multipart mp) throws MessagingException {
-		setDataHandler(new DataHandler(MailDataContentHandler.create("multipart/*"), mp, mp.getContentType()));
+		setDataHandler(new DataHandler(mp.getContentType(), MailDataContentHandler.create("multipart/*"), mp));
 		mp.setParent(this);
 	}
 
@@ -1206,7 +1206,7 @@ public class MimeBodyPart extends BodyPart implements MimePart {
 		 */
 		if (cachedContent != null) {
 			String type = getContentType();
-			dh = new DataHandler(MailDataContentHandler.create(type), cachedContent, type);
+			dh = new DataHandler(type, MailDataContentHandler.create(type), cachedContent);
 			cachedContent = null;
 			content = null;
 			if (contentStream != null) {
@@ -1739,7 +1739,7 @@ public class MimeBodyPart extends BodyPart implements MimePart {
 		MimePart part;
 		
 		public MimePartDataHandler(MimePart part) throws MessagingException {
-			super(MailDataContentHandler.create(part.getContentType()), new MimePartDataSource(part));
+			super(part.getContentType(), MailDataContentHandler.create(part.getContentType()), new MimePartDataSource(part));
 			this.part = part;
 		}
 
