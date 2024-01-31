@@ -8,35 +8,32 @@ body {
 .mg-mail-wrapper {
     box-sizing: border-box;
     background-color: white;
-    width: 60%;
-    margin: 16px 20% 16px 20%;
-    padding: 8px 24px 8px 24px;
+    width: 80%;
+    margin: 16px 24px 16px 20px;
+    padding: 4px;
 }
 
 
-.mg-mail-logo-wrapper {
+.mg-mail-banner {
     height: 64px;
-    background-color: aliceblue;
-    border-radius: 12px;
-    border-style: solid;
-    border-width: 1px;
-    border-color: rgb(228, 228, 255);
-}
-
-.mg-mail-logo {
-    width: 360px;
-    height: 64px;
+   
     background-repeat: no-repeat;
-    background-position: center;
+    background-position: left 20px center;
     background-size: contain;
-    margin: 0px 0px 0px 64px;
+    margin: 0px;
+    padding: 0px;
+    background-color: aliceblue;
+    border-color: aqua;
+    border-radius: 12px;
+    border-width: 1px;
+    border-style: solid;
 }
 
 
 
 
 .mg-h1 {
-    font-family: Helvetica, "Google Sans", Roboto, RobotoDraft, Arial, sans-serif;
+    font-family: Helvetica, Roboto, RobotoDraft, Arial, sans-serif;
     font-size: 32px;
     color: black;
     letter-spacing: normal;
@@ -44,18 +41,18 @@ body {
     /* overflow: hidden; */
     text-overflow: ellipsis;
     white-space: nowrap;
-    margin: 64px 0px 8px 0px;
+    margin: 64px 0px 8px 16px;
 }
 
 .mg-h2 {
-    font-family: Helvetica, "Google Sans", Roboto, RobotoDraft, Arial, sans-serif;
+    font-family: Helvetica, Roboto, RobotoDraft, Arial, sans-serif;
     font-size: 24px;
     color: black;
     letter-spacing: normal;
     font-weight: 500;
     text-overflow: ellipsis;
     white-space: nowrap;
-    margin: 48px 0px 8px 0px;
+    margin: 36px 0px 8px 16px;
 }
 
 .mg-p {
@@ -66,18 +63,19 @@ body {
     font-weight: 400;
     text-overflow: ellipsis;
     white-space: nowrap;
+    margin: 8px 0px 8px 16px;
 }
 
 
 .mg-code-wrapper {
     width: min-content;
-    margin: 8px 0px 8px 0px;
-    padding: 12px 36px 12px 36px;
+    margin: 12px 0px 12px 32px;
+    padding: 8px 36px 8px 36px;
     background-color: rgb(236, 236, 236);
     border-radius: 8px;
     border-width: 1px;
     border-style: solid;
-    border-color: rgb(200, 200, 200);
+    border-color: rgb(199, 199, 199);
     font-family: sans-serif, Helvetica, Arial;
     font-size: 16px;
     color: rgb(87,93, 215);

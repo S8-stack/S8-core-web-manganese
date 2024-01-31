@@ -8,6 +8,7 @@ import com.s8.api.flow.mail.SendMailS8Request;
 import com.s8.api.flow.mail.SendMailS8Request.Status;
 import com.s8.core.io.xml.annotations.XML_SetElement;
 import com.s8.core.io.xml.annotations.XML_Type;
+import com.s8.core.web.manganese.generator.CSS_ClassBase;
 import com.s8.core.web.manganese.javax.mail.Authenticator;
 import com.s8.core.web.manganese.javax.mail.MessagingException;
 import com.s8.core.web.manganese.javax.mail.PasswordAuthentication;
@@ -36,6 +37,8 @@ public class ManganeseWebService {
 		public int port;
 
 		public String defaultSenderDisplayedName;
+		
+		public String CSS_pathname;
 
 		public boolean isVerbose;
 
@@ -53,6 +56,9 @@ public class ManganeseWebService {
 
 		@XML_SetElement(tag = "default-displayed-name")
 		public void setDefualtDisplayname(String name) { this.defaultSenderDisplayedName = name; }
+		
+		@XML_SetElement(tag = "CSS-style-pathname")
+		public void setCSSStyle(String pathname) { this.CSS_pathname = pathname; }
 
 		@XML_SetElement(tag = "is-verbose")
 		public void setVerbosity(boolean isVerbose) { this.isVerbose = isVerbose; }
@@ -82,6 +88,8 @@ public class ManganeseWebService {
 
 	public final ConcurrentLinkedQueue<SendMailS8Request> requestsQueue = new ConcurrentLinkedQueue<>();
 
+	
+	private CSS_ClassBase classBase;
 
 	/**
 	 * 
@@ -97,6 +105,14 @@ public class ManganeseWebService {
 	}
 
 
+	
+	synchronized CSS_ClassBase CSS_getClassBase() {
+		if(classBase == null) {
+			classBase = new CSS_ClassBase();
+			classBase.parseFile(config.CSS_pathname);
+		}
+		return classBase;
+	}
 
 
 	/**

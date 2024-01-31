@@ -3,7 +3,7 @@ package com.s8.core.web.manganese.generator;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MgMailGenerator {
+public class HTML_MgMailContentGenerator {
 
 	/**
 	 * very important
@@ -21,34 +21,29 @@ public class MgMailGenerator {
 
 	public final CSS_ClassBase base;
 
-	private final String wrapperClassname;
+	private CSS_Style wrapperStyle;
 
-	public MgMailGenerator(CSS_ClassBase base, String wrapperClassname) {
+	public HTML_MgMailContentGenerator(CSS_ClassBase base) {
 		super();
 		this.base = base;
-		this.wrapperClassname = wrapperClassname;
-	}
-
-
-
-	public void h1(String classname, String text, CSS_Property... props) {
-		HTML_appendSimpleElement("h1", classname, text, props);
-	}
-
-	public void h2(String classname, String text, CSS_Property... props) {
-		HTML_appendSimpleElement("h2", classname, text, props);
-	}
-
-	public void p(String className, String text, CSS_Property... props) {
-		HTML_appendSimpleElement("p", className, text, props);
-	}
-
-	public void div(String classname, String text, CSS_Property... props) {
-		HTML_appendSimpleElement("div", classname, text, props);
 	}
 	
 	
-	
+	public void setWrapperStyle(String classname, String style) {
+		if(classname != null) {
+			CSS_Style computedStyle = base.CSS_getClass(classname).toStyle();
+			if(style != null) {
+				base.parseStyle(style).forEach(property -> {
+					computedStyle.setProperty(property);	
+				});
+			}
+			wrapperStyle = computedStyle;
+		}
+		else {
+			wrapperStyle = null;
+		}
+	}
+
 	
 	public void logoBanner(String wrapperClassname, String logoClassname, String logoURL) {
 		CSS_Style wrapperStyle = base.CSS_getClass(wrapperClassname).toStyle();
@@ -64,17 +59,22 @@ public class MgMailGenerator {
 	
 	
 
-	public void HTML_appendSimpleElement(String tag, String classname, String text, CSS_Property... props) {
-		CSS_Style style = base.CSS_getClass(classname).toStyle();
-		if(props != null) { 
-			int nProps = props.length; 
-			for(int i = 0; i<nProps; i++) { style.setProperty(props[i]); }
+	public void HTML_appendBaseElement(String tag, String classname, String style, String text) {
+		CSS_Style appliedStyle = null;
+		if(classname != null) {
+			CSS_Style computedStyle = base.CSS_getClass(classname).toStyle();
+			if(style != null) {
+				base.parseStyle(style).forEach(property -> {
+					computedStyle.setProperty(property);	
+				});
+			}
+			appliedStyle = computedStyle;
 		}
-		elements.add(new HTML_SimpleElement(tag, style, text));
+		elements.add(new HTML_BaseElement(tag, appliedStyle, text));
 	}
 
 
-	public String generate() {
+	public String generateContent() {
 
 		StringBuilder builder = new StringBuilder();
 		builder.append(DOCTYPE);
@@ -82,16 +82,14 @@ public class MgMailGenerator {
 		builder.append(HEAD_OPENING);
 		builder.append(HEAD_CLOSING);
 		builder.append(BODY_OPENING);
-
-		CSS_Style wrapperStyle = base.CSS_getClass(wrapperClassname).toStyle();
 		
 		builder.append("\n<div style=\"" + wrapperStyle.getInline() + "\">");
-		builder.append("\n<table>");
+		/* builder.append("\n<table>"); */
 
 		elements.forEach(element -> element.compose(builder));
 
 
-		builder.append("\n</table>");
+		/* builder.append("\n</table>"); */
 		builder.append("\n</div>");
 		builder.append(BODY_CLOSING);
 		builder.append(HTML_CLOSING);

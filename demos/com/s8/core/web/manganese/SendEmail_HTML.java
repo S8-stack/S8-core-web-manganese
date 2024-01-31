@@ -3,7 +3,7 @@ package com.s8.core.web.manganese;
 import java.util.Properties;
 
 import com.s8.core.web.manganese.generator.CSS_ClassBase;
-import com.s8.core.web.manganese.generator.MgMailGenerator;
+import com.s8.core.web.manganese.generator.HTML_MgMailContentGenerator;
 import com.s8.core.web.manganese.javax.mail.Authenticator;
 import com.s8.core.web.manganese.javax.mail.Message;
 import com.s8.core.web.manganese.javax.mail.PasswordAuthentication;
@@ -76,19 +76,22 @@ public class SendEmail_HTML {
 			base.parseFile("/Users/pc/qx/git/S8-core-web-manganese/web-sources/S8-core-web-manganese/mg-mail-style.css");
 			
 			
-			MgMailGenerator mailGenerator = new MgMailGenerator(base, ".mg-mail-wrapper");
-			mailGenerator.logoBanner(
-					".mg-mail-logo-wrapper", 
-					".mg-mail-logo", 
-					"https://alphaventor.com/assets/logos/AlphaventorLogo-1024px-black-text.png");
+			HTML_MgMailContentGenerator mailGenerator = new HTML_MgMailContentGenerator(base);
+			mailGenerator.setWrapperStyle(".mg-mail-wrapper", null);
+			mailGenerator.HTML_appendBaseElement("div", 
+					".mg-mail-banner", "background-image: url(https://alphaventor.com/assets/logos/AlphaventorLogo-1024px-black-text.png);", 
+					null);
 			
-			mailGenerator.h1(".mg-h1", "Hello dear AlphaVentor user!");
-			mailGenerator.h2(".mg-h2", "Welcome to a world of designs");
-			mailGenerator.p(".mg-p", "Your code to validate the creation of your account is just below:");
-			mailGenerator.addCode(".mg-code-wrapper", "trpoekpokpok");
-			mailGenerator.p(".mg-p", "If you're not the initiator of this, please report to pierre.convert@alphaventor.com");
+			mailGenerator.HTML_appendBaseElement("h1", ".mg-h1", null, "Hello dear AlphaVentor user!");
+			mailGenerator.HTML_appendBaseElement("h2", ".mg-h2", null, "Welcome to a world of designs");
+			mailGenerator.HTML_appendBaseElement("p", ".mg-p", null, 
+					"Your code to validate the creation of your account is just below:");
 			
-			String content = mailGenerator.generate();
+			mailGenerator.HTML_appendBaseElement("div", ".mg-code-wrapper", null, "09808trpoekpokpok");
+			
+			mailGenerator.HTML_appendBaseElement("p", ".mg-p", null, "If you're not the initiator of this, please report to pierre.convert@alphaventor.com");
+			
+			String content = mailGenerator.generateContent();
 			
 			message.setContent(content, "text/html");
 

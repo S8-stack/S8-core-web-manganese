@@ -15,7 +15,16 @@ import java.util.regex.Pattern;
 
 public class CSS_ClassBase {
 	
+	/**
+	 * 
+	 */
+	public final static String CLASS_REGEX = "(\\.?[\\w\\-]+) *[{](.*?)[}]";
 	
+	public final static String PROPERTY_REGEX = " *([\\w\\-]+) *: *(.*?);";
+	
+	public final Pattern classPattern = Pattern.compile(CLASS_REGEX);
+	
+	public final Pattern propertyPattern = Pattern.compile(PROPERTY_REGEX);
 	
 	private final Map<String, CSS_Class> classes = new HashMap<>();
 
@@ -35,13 +44,6 @@ public class CSS_ClassBase {
 		return classes.get(className);
 	}
 	
-	
-	/**
-	 * 
-	 */
-	public final static String CLASS_REGEX = "(\\.?[\\w\\-]+) *[{](.*?)[}]";
-	
-	public final static String PROPERTY_REGEX = " *([\\w\\-]+) *: *([\\w\\- \\(\\),]+);";
 
 
 	/**
@@ -50,10 +52,9 @@ public class CSS_ClassBase {
 	 */
 	public synchronized void parseString(String file) {
 		
-		Pattern pattern = Pattern.compile(CLASS_REGEX);
-		Pattern pattern2 = Pattern.compile(PROPERTY_REGEX);
 		
-		Matcher classMatcher = pattern.matcher(file);
+		
+		Matcher classMatcher = classPattern.matcher(file);
 
 		boolean hasClass = classMatcher.find();
 		while(hasClass) {
@@ -61,19 +62,7 @@ public class CSS_ClassBase {
 			String className = classMatcher.group(1);
 			String classProperties = classMatcher.group(2);
 			
-			List<CSS_Property> properties = new ArrayList<>();
-			
-			
-			Matcher propertyMatcher = pattern2.matcher(classProperties);
-			boolean hasProperty = propertyMatcher.find();
-			while(hasProperty) {
-			
-				String propertyName = propertyMatcher.group(1);
-				String propertyValue = propertyMatcher.group(2);
-				properties.add(new CSS_Property(propertyName, propertyValue));
-				
-				hasProperty = propertyMatcher.find();
-			}
+			List<CSS_Property> properties = parseStyle(classProperties);
 			
 			/* build array */
 			int nProperties = properties.size();
@@ -113,6 +102,26 @@ public class CSS_ClassBase {
 		return builder.toString();
 	}
 
+	
+	public List<CSS_Property> parseStyle(String style) {
+		
+		
+		List<CSS_Property> properties = new ArrayList<>();
+		
+		
+		Matcher propertyMatcher = propertyPattern.matcher(style);
+		boolean hasProperty = propertyMatcher.find();
+		while(hasProperty) {
+		
+			String propertyName = propertyMatcher.group(1);
+			String propertyValue = propertyMatcher.group(2);
+			properties.add(new CSS_Property(propertyName, propertyValue));
+			
+			hasProperty = propertyMatcher.find();
+		}
+		
+		return properties;
+	}
 	
 	
 }
