@@ -2,8 +2,8 @@ package com.s8.core.web.manganese;
 
 import java.util.Properties;
 
-import com.s8.core.web.manganese.generator.CSS_ClassBase;
-import com.s8.core.web.manganese.generator.HTML_MgMailContentGenerator;
+import com.s8.core.web.manganese.css.CSS_ClassBase;
+import com.s8.core.web.manganese.html.HTML_MgMailContentGenerator;
 import com.s8.core.web.manganese.javax.mail.Authenticator;
 import com.s8.core.web.manganese.javax.mail.Message;
 import com.s8.core.web.manganese.javax.mail.PasswordAuthentication;

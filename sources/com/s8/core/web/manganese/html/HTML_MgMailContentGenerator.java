@@ -1,7 +1,10 @@
-package com.s8.core.web.manganese.generator;
+package com.s8.core.web.manganese.html;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import com.s8.core.web.manganese.css.CSS_ClassBase;
+import com.s8.core.web.manganese.css.CSS_Style;
 
 public class HTML_MgMailContentGenerator {
 

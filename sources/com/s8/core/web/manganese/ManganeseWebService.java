@@ -8,7 +8,7 @@ import com.s8.api.flow.mail.SendMailS8Request;
 import com.s8.api.flow.mail.SendMailS8Request.Status;
 import com.s8.core.io.xml.annotations.XML_SetElement;
 import com.s8.core.io.xml.annotations.XML_Type;
-import com.s8.core.web.manganese.generator.CSS_ClassBase;
+import com.s8.core.web.manganese.css.CSS_ClassBase;
 import com.s8.core.web.manganese.javax.mail.Authenticator;
 import com.s8.core.web.manganese.javax.mail.MessagingException;
 import com.s8.core.web.manganese.javax.mail.PasswordAuthentication;

@@ -1,4 +1,4 @@
-package com.s8.core.web.manganese.generator;
+package com.s8.core.web.manganese.html;
 
 public abstract class HTML_Element {
 	

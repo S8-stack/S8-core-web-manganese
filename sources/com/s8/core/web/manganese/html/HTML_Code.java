@@ -1,4 +1,6 @@
-package com.s8.core.web.manganese.generator;
+package com.s8.core.web.manganese.html;
+
+import com.s8.core.web.manganese.css.CSS_Style;
 
 public class HTML_Code extends HTML_Element {
 

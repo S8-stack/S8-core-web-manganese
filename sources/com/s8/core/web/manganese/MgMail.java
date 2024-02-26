@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 
 import com.s8.api.flow.mail.S8Mail;
-import com.s8.core.web.manganese.generator.HTML_MgMailContentGenerator;
+import com.s8.core.web.manganese.html.HTML_MgMailContentGenerator;
 import com.s8.core.web.manganese.javax.mail.Message;
 import com.s8.core.web.manganese.javax.mail.MessagingException;
 import com.s8.core.web.manganese.javax.mail.Session;

@@ -1,6 +1,6 @@
 package com.s8.core.web.manganese;
 
-import com.s8.core.web.manganese.generator.CSS_ClassBase;
+import com.s8.core.web.manganese.css.CSS_ClassBase;
 
 public class CSS_ParsingTest02 {
 
