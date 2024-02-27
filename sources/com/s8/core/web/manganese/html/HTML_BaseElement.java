@@ -1,5 +1,7 @@
 package com.s8.core.web.manganese.html;
 
+import java.util.List;
+
 import com.s8.core.web.manganese.css.CSS_Style;
 
 /**
@@ -8,10 +10,21 @@ import com.s8.core.web.manganese.css.CSS_Style;
 public class HTML_BaseElement extends HTML_Element {
 
 
+	/**
+	 * 
+	 */
 	public final String tag;
 
+	
+	/**
+	 * 
+	 */
 	public final CSS_Style style;
 
+	
+	/**
+	 * 
+	 */
 	public final String text;
 
 
@@ -28,21 +41,23 @@ public class HTML_BaseElement extends HTML_Element {
 	 * 
 	 * @param builder
 	 */
-	public void compose(StringBuilder builder) {
+	@Override
+	public void compose(List<String> lines) {
 
 		/*
 		builder.append("\n<tr>");
 		builder.append("\n<td>");
 		*/
 
-		/* opening tag */
+		/* <opening-tag> */
+		StringBuilder builder = new StringBuilder();
 		builder.append("<");
 		builder.append(tag);
 		if(style != null) {
 			builder.append(" style=\"");
 			builder.append(style.getInline());
 		}
-		builder.append("\">");	
+		builder.append("\">");
 		/* </opening-tag> */
 
 		if(text != null) {
@@ -55,6 +70,8 @@ public class HTML_BaseElement extends HTML_Element {
 		builder.append(">");
 		/* </closing-tag> */
 
+
+		lines.add(builder.toString());
 		/*
 		builder.append("\n</td>");
 		builder.append("\n</tr>");

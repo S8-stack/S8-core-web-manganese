@@ -77,25 +77,24 @@ public class HTML_MgMailContentGenerator {
 	}
 
 
-	public String generateContent() {
+	public void generateContent(List<String> lines) {
 
-		StringBuilder builder = new StringBuilder();
-		builder.append(DOCTYPE);
-		builder.append(HTML_OPENING);
-		builder.append(HEAD_OPENING);
-		builder.append(HEAD_CLOSING);
-		builder.append(BODY_OPENING);
+		lines.add(DOCTYPE);
+		lines.add(HTML_OPENING);
+		lines.add(HEAD_OPENING);
+		lines.add(HEAD_CLOSING);
+		lines.add(BODY_OPENING);
 		
-		builder.append("\n<div style=\"" + wrapperStyle.getInline() + "\">");
+		lines.add("\n<div style=\"" + wrapperStyle.getInline() + "\">");
 		/* builder.append("\n<table>"); */
 
-		elements.forEach(element -> element.compose(builder));
+		elements.forEach(element -> element.compose(lines));
 
 
 		/* builder.append("\n</table>"); */
-		builder.append("\n</div>");
-		builder.append(BODY_CLOSING);
-		builder.append(HTML_CLOSING);
+		lines.add("\n</div>");
+		lines.add(BODY_CLOSING);
+		lines.add(HTML_CLOSING);
 
 		/*
 		<!DOCTYPE html>
@@ -115,8 +114,6 @@ public class HTML_MgMailContentGenerator {
 		</body>
 		</html>
 		 */
-
-		return builder.toString();
 	}
 
 

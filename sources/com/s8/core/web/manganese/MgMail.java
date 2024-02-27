@@ -2,14 +2,17 @@ package com.s8.core.web.manganese;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 import com.s8.api.flow.mail.S8Mail;
 import com.s8.core.web.manganese.html.HTML_MgMailContentGenerator;
-import com.s8.core.web.manganese.javax.mail.Message;
 import com.s8.core.web.manganese.javax.mail.MessagingException;
 import com.s8.core.web.manganese.javax.mail.Session;
-import com.s8.core.web.manganese.javax.mail.internet.InternetAddress;
-import com.s8.core.web.manganese.javax.mail.internet.MimeMessage;
+import com.s8.core.web.manganese.mime.MIME_Composer;
+import com.s8.core.web.manganese.mime.MIME_Header;
+import com.s8.core.web.manganese.mime.MIME_Syntax;
 
 
 /**
@@ -20,21 +23,27 @@ public class MgMail implements S8Mail {
 
 	public final ManganeseWebService service;
 
-	final Message emailMessage;
 
 	private final HTML_MgMailContentGenerator generator;
 
 
 	public final static String DEFAULT_SENDER_NAME = "S8 Mail WebService";
 
-	private boolean isSenderDefined = false;
+	private String senderName;
 
-	private boolean isRecipientsDefined = false;
+	private boolean isSenderNameDefined = false;
+
+	private String recipientEmail;
+
+	private boolean isRecipientDefined = false;
+
+	private String subject;
 
 	private boolean isSubjectSet = false;
 
-
 	private boolean isLocked = false;
+
+	private List<String> content;
 
 	/**
 	 * 
@@ -52,8 +61,6 @@ public class MgMail implements S8Mail {
 
 		this.generator = new HTML_MgMailContentGenerator(service.CSS_getClassBase());
 
-		/* create message */
-		this.emailMessage = new MimeMessage(session);
 	}
 
 
@@ -61,42 +68,24 @@ public class MgMail implements S8Mail {
 	@Override
 	public void setDisplayedSender(String name) throws IOException {
 		if(isLocked) { throw new IOException("Mail is already closed"); }
-		try {
-			emailMessage.setFrom(new InternetAddress(service.getMailServerUsername(), name));
-			this.isSenderDefined = true;
-		} 
-		catch (UnsupportedEncodingException | MessagingException e) {
-			throw new IOException("Invalid sender: "+e.getMessage());
-		}
+		this.senderName = name;
+		this.isSenderNameDefined = true;
 	}
-
 
 
 	@Override
 	public void setRecipient(String email) throws IOException {
 		if(isLocked) { throw new IOException("Mail is already closed"); }
-		try {
-			InternetAddress[] address = InternetAddress.parse(email);
-			emailMessage.setRecipients(Message.RecipientType.TO, address);
-			isRecipientsDefined = true;
-		} catch (MessagingException e) {
-			throw new IOException("Failed to set recipients: "+e.getMessage());
-		}
-
+		this.recipientEmail = email;
+		this.isRecipientDefined = true;
 	}
 
 
 	@Override
 	public void setSubject(String text) throws IOException {
 		if(isLocked) { throw new IOException("Mail is already closed"); }
-		try {
-			emailMessage.setSubject(text);
-			isSubjectSet = true;
-		} 
-		catch (MessagingException e) {
-			e.printStackTrace();
-			throw new IOException("Failed to set subject: "+e.getMessage());
-		}
+		this.subject = text;
+		this.isSubjectSet = true;
 	}
 
 
@@ -107,10 +96,12 @@ public class MgMail implements S8Mail {
 	}
 
 
-
 	@Override
-	public void HTML_appendBaseElement(String tag, String CSS_classname, String CSS_style, String innerHTMLText)
-			throws IOException {
+	public void HTML_appendBaseElement(String tag, 
+			String CSS_classname, 
+			String CSS_style, 
+			String innerHTMLText)
+					throws IOException {
 		if(isLocked) { throw new IOException("Mail is already closed"); }
 		generator.HTML_appendBaseElement(tag, CSS_classname, CSS_style, innerHTMLText);	
 	}
@@ -118,27 +109,35 @@ public class MgMail implements S8Mail {
 
 
 
-	public void validate() throws IOException {
+	public void compile() throws IOException {
 		if(isLocked) { throw new IOException("Mail is already closed"); }
-		if(!isRecipientsDefined) { throw new IOException("No recipient"); }
+		if(!isRecipientDefined) { throw new IOException("No recipient"); }
 
 		try {
-			if(!isSenderDefined) {
-				emailMessage.setFrom(new InternetAddress(
-						service.getMailServerUsername(), 
-						service.getdefaultSenderDisplayedName()));
+			if(!isSenderNameDefined) {
+				setDisplayedSender(service.getdefaultSenderDisplayedName() + '<' + service.getMailServerUsername() + '>');
 			}
 
 			if(!isSubjectSet) {
-				emailMessage.setSubject("WebService email");
+				setSubject("WebService email");
 			}
 
 			/* generate content */
-			String content = generator.generateContent();
-			emailMessage.setContent(content, "text/html");
+			List<String> body = new ArrayList<>();
 
+			body.add(MIME_Composer.composeHeaders(
+					new MIME_Header("From", senderName),
+					new MIME_Header("To", recipientEmail),
+					new MIME_Header("Subject", subject),
+					new MIME_Header("Date", new Date(System.currentTimeMillis()).toString()),
+					new MIME_Header("Content-Type", "text/html; charset=UTF-8"),
+					new MIME_Header("MIME-Version", "1.0")));
+
+			generator.generateContent(body);
+
+			content = body;
 		} 
-		catch (UnsupportedEncodingException | MessagingException e) {
+		catch (UnsupportedEncodingException e) {
 			e.printStackTrace();
 			throw new IOException("Failed to validate message");
 		}
@@ -148,8 +147,36 @@ public class MgMail implements S8Mail {
 
 
 
+	/**
+	 * 
+	 * @return
+	 */
+	public String getSubject() {
+		return subject;
+	}
 
 
+	/**
+	 * 
+	 * @return
+	 */
+	public String getRecipientMailAddress() {
+		return recipientEmail;
+	}
+
+
+	/**
+	 * 
+	 * @return
+	 */
+	public String getSenderName() {
+		return senderName;
+	}
+
+
+	public List<String> getContent() {
+		return content;
+	}
 
 
 }

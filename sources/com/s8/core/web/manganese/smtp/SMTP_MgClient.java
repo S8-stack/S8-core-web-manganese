@@ -2,6 +2,7 @@ package com.s8.core.web.manganese.smtp;
 
 import java.io.IOException;
 import java.net.Socket;
+import java.util.List;
 
 import javax.net.SocketFactory;
 import javax.net.ssl.SSLParameters;
@@ -67,7 +68,7 @@ public class SMTP_MgClient {
 	public void sendMail(SASL_Authenticator authenticator, 
 			String reversePath, 
 			String forwardPath, 
-			String[] dataLines, boolean isVerbose) throws IOException {
+			List<String> dataLines, boolean isVerbose) throws IOException {
 
 		SMTP_Connection connection = createConnection(isVerbose);
 		/*

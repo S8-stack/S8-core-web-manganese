@@ -1,7 +1,7 @@
 package com.s8.core.web.manganese;
 
 import java.io.IOException;
-import java.util.Properties;
+import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import com.s8.api.flow.mail.SendMailS8Request;
@@ -9,11 +9,11 @@ import com.s8.api.flow.mail.SendMailS8Request.Status;
 import com.s8.core.io.xml.annotations.XML_SetElement;
 import com.s8.core.io.xml.annotations.XML_Type;
 import com.s8.core.web.manganese.css.CSS_ClassBase;
-import com.s8.core.web.manganese.javax.mail.Authenticator;
 import com.s8.core.web.manganese.javax.mail.MessagingException;
-import com.s8.core.web.manganese.javax.mail.PasswordAuthentication;
 import com.s8.core.web.manganese.javax.mail.Session;
-import com.s8.core.web.manganese.javax.mail.Transport;
+import com.s8.core.web.manganese.sasl.SASL_Authenticator;
+import com.s8.core.web.manganese.sasl.SASL_PlainAuthenticator;
+import com.s8.core.web.manganese.smtp.SMTP_MgClient;
 
 
 
@@ -29,12 +29,15 @@ public class ManganeseWebService {
 	public static class Config {
 
 		public String host;
+		
+		public int port;
+		
+		public String[] tunnelingProtocols = new String[] { "TLSv1.3" };
 
 		public String username;
 
 		public String password;
 
-		public int port;
 
 		public String defaultSenderDisplayedName;
 		
@@ -42,17 +45,21 @@ public class ManganeseWebService {
 
 		public boolean isVerbose;
 
-		@XML_SetElement(tag = "server")
+		@XML_SetElement(tag = "host")
 		public void setMailServer(String host) { this.host = host; }
 
+		@XML_SetElement(tag = "port")
+		public void setPort(int port) { this.port = port; }
+		
+		@XML_SetElement(tag = "tunneling-protocols")
+		public void setTunnelingProtocols(String protocols) { this.tunnelingProtocols = protocols.split(" *, *"); }
+		
 		@XML_SetElement(tag = "username")
 		public void setUsername(String username) { this.username = username; }
 
 		@XML_SetElement(tag = "password")
 		public void setPassword(String password) { this.password = password; }
 
-		@XML_SetElement(tag = "port")
-		public void setPort(int port) { this.port = port; }
 
 		@XML_SetElement(tag = "default-displayed-name")
 		public void setDefualtDisplayname(String name) { this.defaultSenderDisplayedName = name; }
@@ -85,6 +92,9 @@ public class ManganeseWebService {
 
 
 
+	public final SMTP_MgClient smtp_client;
+	
+	public final SASL_Authenticator sasl_authenticator;
 
 	public final ConcurrentLinkedQueue<SendMailS8Request> requestsQueue = new ConcurrentLinkedQueue<>();
 
@@ -102,6 +112,10 @@ public class ManganeseWebService {
 		super();
 		this.config = config;
 		this.isVerbose = config.isVerbose;
+		
+		smtp_client = new SMTP_MgClient(config.host, config.port, config.tunnelingProtocols);
+		
+		sasl_authenticator = new SASL_PlainAuthenticator(config.username, config.password);
 	}
 
 
@@ -115,33 +129,7 @@ public class ManganeseWebService {
 	}
 
 
-	/**
-	 * 
-	 * @return
-	 */
-	private synchronized Session getSession() {
-
-		if(session == null) {
-
-			Properties props = new Properties();
-			props.put("mail.smtp.host", config.host);
-			props.put("mail.smtp.auth", "true");
-			props.put("mail.smtp.port", config.port);
-			props.put("mail.smtp.starttls.enable", "true"); //TLS
-
-			session = Session.getInstance(props, new Authenticator() {
-				@Override
-				public PasswordAuthentication getPasswordAuthentication() {
-					return new PasswordAuthentication(config.username, config.password);
-				}
-			});
-
-			if(isVerbose) {
-				System.out.println("Mail session is now created");
-			}
-		}
-		return session;
-	}
+	
 
 
 	private synchronized void disconnect() {
@@ -161,20 +149,20 @@ public class ManganeseWebService {
 		while(!isTerminated && nAttempts++ < maxNbAttempts) {
 			try {
 				
-				/* retrieve session */
-				Session session = getSession();
-
 				/* create mail */
 				MgMail mail = new MgMail(this, session);
 
 				/* compose mail */
-				request.compose(mail);	
+				request.compose(mail);
 				
 				/* validate before sending */
-				mail.validate();
+				mail.compile();
 
-				/* send */
-				Transport.send(mail.emailMessage);
+				List<String> content = mail.getContent();
+				
+				
+				
+				smtp_client.sendMail(sasl_authenticator, config.username, mail.getRecipientMailAddress(), content, config.isVerbose);
 				
 				isTerminated = true;
 				request.onSent(Status.OK, "Sent");

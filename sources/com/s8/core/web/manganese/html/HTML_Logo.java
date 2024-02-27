@@ -1,5 +1,7 @@
 package com.s8.core.web.manganese.html;
 
+import java.util.List;
+
 import com.s8.core.web.manganese.css.CSS_Style;
 
 public class HTML_Logo extends HTML_Element {
@@ -29,25 +31,25 @@ public class HTML_Logo extends HTML_Element {
 
 
 	@Override
-	public void compose(StringBuilder builder) {
+	public void compose(List<String> lines) {
 		
-		builder.append("\n<tr>");
-		builder.append("\n<td>");
+		lines.add("\n<tr>");
+		lines.add("\n<td>");
 
 		
-		builder.append("\n<div style=\"");
-		builder.append(wrapperStyle.getInline());
-		builder.append("\">");
+		lines.add("\n<div style=\"");
+		lines.add(wrapperStyle.getInline());
+		lines.add("\">");
 		
-		builder.append("\n<div style=\"");
-		builder.append(logoStyle.getInline());
-		builder.append("\">");
+		lines.add("\n<div style=\"");
+		lines.add(logoStyle.getInline());
+		lines.add("\">");
 		
-		builder.append("\n</div>");
-		builder.append("\n</div>");
+		lines.add("\n</div>");
+		lines.add("\n</div>");
 
-		builder.append("\n<td>");
-		builder.append("\n<tr>");
+		lines.add("\n<td>");
+		lines.add("\n<tr>");
 	}
 
 }

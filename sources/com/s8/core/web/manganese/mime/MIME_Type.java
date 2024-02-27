@@ -3,6 +3,7 @@ package com.s8.core.web.manganese.mime;
 import com.s8.core.web.manganese.javax.mail.MessagingException;
 
 public class MIME_Type {
+	
 
 	public static String fromExtension(String filename) throws MessagingException {
 		

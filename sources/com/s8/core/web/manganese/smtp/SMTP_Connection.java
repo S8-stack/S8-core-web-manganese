@@ -7,6 +7,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 
 import javax.net.ssl.SSLParameters;
 import javax.net.ssl.SSLSocket;
@@ -18,24 +19,6 @@ import javax.net.ssl.SSLSocketFactory;
 public class SMTP_Connection {
 
 	
-
-	/**
-	 * Lines consist of zero or more data characters terminated by the sequence
-	 * ASCII character "CR" (hex value 0D) followed immediately by ASCII character
-	 * "LF" (hex value 0A). This termination sequence is denoted as <CRLF> in this
-	 * document. Conforming implementations MUST NOT recognize or generate any other
-	 * character or character sequence as a line terminator. Limits MAY be imposed
-	 * on line lengths by servers (see Section 4).
-	 * 
-	 * "\r" = \u000d: carriage return CR "\n" = \u000a: linefeed LF
-	 */
-	public final static String CRLF = "\r\n";
-
-	public final static char SP = ' ';
-
-	public final static char HYPHEN = '-';
-	
-	public final static char DATA_TERMINATION = '.';
 
 	
 	
@@ -130,9 +113,9 @@ public class SMTP_Connection {
 
 			/* has more lines */
 			char continuationChar = line.charAt(3);
-			if (continuationChar == SP) {
+			if (continuationChar == SMTP_Syntax.SP) {
 				hasMoreLines = false;
-			} else if (continuationChar == HYPHEN) {
+			} else if (continuationChar == SMTP_Syntax.HYPHEN) {
 				hasMoreLines = true;
 			} else {
 				throw new IOException("Unsupported continuation char");
@@ -201,7 +184,7 @@ public class SMTP_Connection {
 	
 	public void sendCommand(String command) throws IOException {
 		out.append(command);
-		out.append(CRLF);
+		out.append(SMTP_Syntax.CRLF);
 		out.flush();
 		if(isVerbose) {
 			System.out.print("\tClient > "+command+"\n");
@@ -238,17 +221,17 @@ public class SMTP_Connection {
 	 * @param lines
 	 * @throws IOException 
 	 */
-	public void sendData(String[] lines) throws IOException {
-		int nLines = lines.length;
+	public void sendData(List<String> lines) throws IOException {
+		int nLines = lines.size();
 		for(int i = 0; i<nLines; i++) {
-			out.append(lines[i]);
-			out.append(CRLF);
+			out.append(lines.get(i));
+			out.append(SMTP_Syntax.CRLF);
 			if(isVerbose) {
-				System.out.print("\tClient > "+lines[i]+"\n");
+				System.out.print("\tClient > "+lines.get(i)+"\n");
 			}
 		}
-		out.append(DATA_TERMINATION);
-		out.append(CRLF);
+		out.append(SMTP_Syntax.DATA_TERMINATION);
+		out.append(SMTP_Syntax.CRLF);
 		if(isVerbose) {
 			System.out.print("\tClient > .\n");
 		}

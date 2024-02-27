@@ -1,5 +1,7 @@
 package com.s8.core.web.manganese.html;
 
+import java.util.List;
+
 import com.s8.core.web.manganese.css.CSS_Style;
 
 public class HTML_Code extends HTML_Element {
@@ -30,19 +32,19 @@ public class HTML_Code extends HTML_Element {
 
 
 	@Override
-	public void compose(StringBuilder builder) {
+	public void compose(List<String> lines) {
 		
-		builder.append("\n<tr><td>");
+		lines.add("\n<tr><td>");
 		
-		builder.append("\n<span style=\"");
-		builder.append(style.getInline());
-		builder.append("\">");
+		lines.add("\n<span style=\"");
+		lines.add(style.getInline());
+		lines.add("\">");
 		
-		builder.append(text);
+		lines.add(text);
 		
-		builder.append("</span>");
+		lines.add("</span>");
 		
-		builder.append("\n<td><tr>");
+		lines.add("\n<td><tr>");
 	}
 
 }
