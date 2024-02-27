@@ -1,11 +1,12 @@
 package com.s8.core.web.manganese.mime;
 
-import com.s8.core.web.manganese.javax.mail.MessagingException;
+import java.io.IOException;
 
 public class MIME_Type {
 	
 
-	public static String fromExtension(String filename) throws MessagingException {
+	
+	public static String fromExtension(String filename) throws IOException {
 		
 		
 		if(filename.endsWith(".jpeg") || filename.endsWith(".jpg")) {
@@ -21,7 +22,7 @@ public class MIME_Type {
 			return "text/html";
 		}
 		else {
-			throw new MessagingException("Unreckognized extension MIME type");
+			throw new IOException("Unreckognized extension MIME type");
 		}
 	}
 

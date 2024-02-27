@@ -53,21 +53,11 @@ module com.s8.core.web.manganese {
 	*/
 	
 	
-	uses com.s8.core.web.manganese.javax.mail.Provider;
-	
-	provides com.s8.core.web.manganese.javax.mail.Provider with com.s8.core.web.manganese.javax.mail.smtp.SMTPProvider;
 	
 	requires transitive com.s8.api;
 	requires transitive com.s8.core.io.xml;
 	requires transitive com.s8.core.arch.silicon;
-	
-	
-	requires java.base;
-	requires java.datatransfer;
-	requires java.logging;
-	requires java.desktop;
-	requires java.security.sasl;
-	
+
 
 	
 }

@@ -1,6 +1,8 @@
 package com.s8.core.web.manganese;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.s8.core.web.manganese.sasl.SASL_PlainAuthenticator;
 import com.s8.core.web.manganese.smtp.SMTP_MgClient;
@@ -15,11 +17,16 @@ public class TestMgClient {
 				"noreply@alphaventor.com", 
 				"aGEvxCd-&_8FGX-dMOiweRE!_XH");
 		
+		
+		List<String> lines = new ArrayList<>();
+		lines.add("A super simple mail");
+		lines.add("Hi!");
+		
 		client.sendMail(
 				authenticator,
 				"noreply@alphaventor.com", 
 				"convert.pierre@gmail.com", 
-				new String[]{ "A super simple mail", "Hi!"}, true);
+				lines, true);
 		
 		
 	}

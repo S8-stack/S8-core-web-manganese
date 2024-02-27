@@ -9,8 +9,6 @@ import com.s8.api.flow.mail.SendMailS8Request.Status;
 import com.s8.core.io.xml.annotations.XML_SetElement;
 import com.s8.core.io.xml.annotations.XML_Type;
 import com.s8.core.web.manganese.css.CSS_ClassBase;
-import com.s8.core.web.manganese.javax.mail.MessagingException;
-import com.s8.core.web.manganese.javax.mail.Session;
 import com.s8.core.web.manganese.sasl.SASL_Authenticator;
 import com.s8.core.web.manganese.sasl.SASL_PlainAuthenticator;
 import com.s8.core.web.manganese.smtp.SMTP_MgClient;
@@ -86,11 +84,6 @@ public class ManganeseWebService {
 
 	private boolean isVerbose;
 
-	private Session session;
-
-
-
-
 
 	public final SMTP_MgClient smtp_client;
 	
@@ -129,13 +122,6 @@ public class ManganeseWebService {
 	}
 
 
-	
-
-
-	private synchronized void disconnect() {
-		session = null;
-	}
-
 
 
 	public final static int NB_ATTEMPTS = 4;
@@ -150,31 +136,23 @@ public class ManganeseWebService {
 			try {
 				
 				/* create mail */
-				MgMail mail = new MgMail(this, session);
+				MgMail mail = new MgMail(this);
 
 				/* compose mail */
 				request.compose(mail);
 				
-				/* validate before sending */
-				mail.compile();
-
-				List<String> content = mail.getContent();
+				/* compile into lines */
+				List<String> body = mail.compile();
 				
-				
-				
-				smtp_client.sendMail(sasl_authenticator, config.username, mail.getRecipientMailAddress(), content, config.isVerbose);
+				smtp_client.sendMail(sasl_authenticator, config.username, mail.getRecipientMailAddress(), body, isVerbose);
 				
 				isTerminated = true;
 				request.onSent(Status.OK, "Sent");
 			} 
-			catch (MessagingException e) {
+			catch (MgServerException e) {
 				if(nAttempts == maxNbAttempts) {
 					isTerminated = true;
 					request.onSent(Status.MAIL_REJECTED_BY_OUTGOING_SERVER, e.getMessage());
-				}
-				else {
-					disconnect();
-					if(isVerbose) { e.printStackTrace(); }
 				}
 			}
 			catch (IOException e) {
