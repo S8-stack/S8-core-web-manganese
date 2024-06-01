@@ -22,12 +22,16 @@ public class HTML_MgMailContentGenerator {
 
 	private final List<HTML_Element> elements = new ArrayList<>();
 
-	public final CSS_ClassBase base;
+	private CSS_ClassBase base;
 
 	private CSS_Style wrapperStyle;
 
 	public HTML_MgMailContentGenerator(CSS_ClassBase base) {
 		super();
+		this.base = base;
+	}
+	
+	public void setBaseClass(CSS_ClassBase base) {
 		this.base = base;
 	}
 	

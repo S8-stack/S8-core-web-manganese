@@ -18,8 +18,7 @@ import com.s8.core.web.manganese.mime.MIME_Header;
 public class MgMail implements S8Mail {
 
 
-	public final ManganeseWebService service;
-
+	public final MgMailDefaultSettings defaultSettings;
 
 	private final HTML_MgMailContentGenerator html_generator;
 
@@ -47,12 +46,12 @@ public class MgMail implements S8Mail {
 	 * @throws UnsupportedEncodingException
 	 * @throws MessagingException
 	 */
-	MgMail(ManganeseWebService service) throws UnsupportedEncodingException {
+	MgMail(MgMailDefaultSettings defaultSettings) throws UnsupportedEncodingException {
 		super();
 
-		this.service = service;
+		this.defaultSettings = defaultSettings;
 
-		this.html_generator = new HTML_MgMailContentGenerator(service.CSS_getClassBase());
+		this.html_generator = new HTML_MgMailContentGenerator(defaultSettings.CSS_getClassBase());
 
 	}
 
@@ -101,7 +100,7 @@ public class MgMail implements S8Mail {
 		if(!isRecipientDefined) { throw new IOException("No recipient"); }
 
 		if(!isSenderNameDefined) {
-			setDisplayedSender(service.getdefaultSenderDisplayedName() + '<' + service.getMailServerUsername() + '>');
+			setDisplayedSender(defaultSettings.getSenderDisplayedName() + '<' + defaultSettings.getSenderEmailAddress() + '>');
 		}
 
 		if(!isSubjectSet) {

@@ -63,6 +63,7 @@ public class SMTP_MgClient {
 
 	/**
 	 * @throws IOException 
+	 * @throws InterruptedException 
 	 * 
 	 */
 	public void sendMail(SASL_Authenticator authenticator, 
@@ -75,9 +76,10 @@ public class SMTP_MgClient {
 		 * close connection
 		 */
 		SMTP_Reply reply;
-
+		
 		reply = connection.receiveReply();
 
+		
 		// Server: 220 server.net Simple Mail Transfer Service Ready
 		if(reply.code != SMTP_ReplyCode.DOMAIN_SERVICE_IS_READY) {
 			throw new IOException();
@@ -90,8 +92,9 @@ public class SMTP_MgClient {
 		if(reply.code != SMTP_ReplyCode.OK) { throw new MgServerException(reply); }
 		
 		connection.sendCommand("STARTTLS");
+		
 		reply = connection.receiveReply(); /* GO AHEAD */
-		if(reply.code != SMTP_ReplyCode.DOMAIN_SERVICE_IS_READY) { throw new MgServerException(reply); }
+		//if(reply.code != SMTP_ReplyCode.DOMAIN_SERVICE_IS_READY) { throw new MgServerException(reply); }
 		
 		connection.upgradeTLS();
 		

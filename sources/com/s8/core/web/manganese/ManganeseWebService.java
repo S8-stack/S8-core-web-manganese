@@ -6,11 +6,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 import com.s8.api.flow.mail.SendMailS8Request;
 import com.s8.api.flow.mail.SendMailS8Request.Status;
-import com.s8.core.io.xml.annotations.XML_SetElement;
-import com.s8.core.io.xml.annotations.XML_Type;
-import com.s8.core.web.manganese.css.CSS_ClassBase;
 import com.s8.core.web.manganese.sasl.SASL_Authenticator;
-import com.s8.core.web.manganese.sasl.SASL_PlainAuthenticator;
 import com.s8.core.web.manganese.smtp.SMTP_MgClient;
 
 
@@ -23,64 +19,12 @@ import com.s8.core.web.manganese.smtp.SMTP_MgClient;
 public class ManganeseWebService {
 
 
-	@XML_Type(name = "ManganeseWebServiceConfiguration")
-	public static class Config {
 
-		public String host;
-		
-		public int port;
-		
-		public String[] tunnelingProtocols = new String[] { "TLSv1.3" };
-
-		public String username;
-
-		public String password;
-
-
-		public String defaultSenderDisplayedName;
-		
-		public String CSS_pathname;
-
-		public boolean isVerbose;
-
-		@XML_SetElement(tag = "host")
-		public void setMailServer(String host) { this.host = host; }
-
-		@XML_SetElement(tag = "port")
-		public void setPort(int port) { this.port = port; }
-		
-		@XML_SetElement(tag = "tunneling-protocols")
-		public void setTunnelingProtocols(String protocols) { this.tunnelingProtocols = protocols.split(" *, *"); }
-		
-		@XML_SetElement(tag = "username")
-		public void setUsername(String username) { this.username = username; }
-
-		@XML_SetElement(tag = "password")
-		public void setPassword(String password) { this.password = password; }
-
-
-		@XML_SetElement(tag = "default-displayed-name")
-		public void setDefualtDisplayname(String name) { this.defaultSenderDisplayedName = name; }
-		
-		@XML_SetElement(tag = "CSS-style-pathname")
-		public void setCSSStyle(String pathname) { this.CSS_pathname = pathname; }
-
-		@XML_SetElement(tag = "is-verbose")
-		public void setVerbosity(boolean isVerbose) { this.isVerbose = isVerbose; }
-
-
-		/**
-		 * 
-		 */
-		public Config() {
-			super();
-		}
-	}
 
 
 	public final static String ROOT_WEB_PATHNAME = "/";
 
-	public final Config config;
+	public final MgConfiguration config;
 
 	private boolean isVerbose;
 
@@ -91,8 +35,7 @@ public class ManganeseWebService {
 
 	public final ConcurrentLinkedQueue<SendMailS8Request> requestsQueue = new ConcurrentLinkedQueue<>();
 
-	
-	private CSS_ClassBase classBase;
+	public final MgMailDefaultSettings defaultSettings;
 
 	/**
 	 * 
@@ -101,27 +44,24 @@ public class ManganeseWebService {
 	 * @param config
 	 * @throws Exception
 	 */
-	public ManganeseWebService(Config config) throws Exception {
+	public ManganeseWebService(MgConfiguration config) throws Exception {
 		super();
 		this.config = config;
 		this.isVerbose = config.isVerbose;
 		
 		smtp_client = new SMTP_MgClient(config.host, config.port, config.tunnelingProtocols);
 		
-		sasl_authenticator = new SASL_PlainAuthenticator(config.username, config.password);
+		sasl_authenticator = config.authenticationConfig.generateAuthenticator();
+		
+		defaultSettings = new MgMailDefaultSettings(
+				config.CSS_pathname, 
+				config.senderEmail,
+				config.senderName);
 	}
 
 
 	
-	synchronized CSS_ClassBase CSS_getClassBase() {
-		if(classBase == null) {
-			classBase = new CSS_ClassBase();
-			classBase.parseFile(config.CSS_pathname);
-		}
-		return classBase;
-	}
-
-
+	
 
 
 	public final static int NB_ATTEMPTS = 4;
@@ -136,7 +76,7 @@ public class ManganeseWebService {
 			try {
 				
 				/* create mail */
-				MgMail mail = new MgMail(this);
+				MgMail mail = new MgMail(defaultSettings);
 
 				/* compose mail */
 				request.compose(mail);
@@ -144,7 +84,7 @@ public class ManganeseWebService {
 				/* compile into lines */
 				List<String> body = mail.compile();
 				
-				smtp_client.sendMail(sasl_authenticator, config.username, mail.getRecipientMailAddress(), body, isVerbose);
+				smtp_client.sendMail(sasl_authenticator, config.senderEmail, mail.getRecipientMailAddress(), body, isVerbose);
 				
 				isTerminated = true;
 				request.onSent(Status.OK, "Sent");
@@ -163,13 +103,7 @@ public class ManganeseWebService {
 	}
 
 
-	public String getMailServerUsername() {
-		return config.username;
-	}
-
-	public String getdefaultSenderDisplayedName() {
-		return config.defaultSenderDisplayedName;
-	}	
+	
 
 
 }

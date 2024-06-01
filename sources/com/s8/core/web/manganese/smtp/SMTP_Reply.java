@@ -2,7 +2,7 @@ package com.s8.core.web.manganese.smtp;
 
 public class SMTP_Reply {
 
-	public final static int MAX_NB_REPLY_LINES = 8;
+	public final static int MAX_NB_REPLY_LINES = 256;
 
 	public final int code;
 
