@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import com.s8.api.flow.mail.S8Mail;
+import com.s8.api.flow.mail.S8MailBuilder;
 import com.s8.core.web.manganese.html.HTML_MgMailContentGenerator;
 import com.s8.core.web.manganese.mime.MIME_Composer;
 import com.s8.core.web.manganese.mime.MIME_Header;
@@ -15,7 +15,7 @@ import com.s8.core.web.manganese.mime.MIME_Header;
 /**
  * 
  */
-public class MgMail implements S8Mail {
+public class MgMail implements S8MailBuilder {
 
 
 	public final MgMailDefaultSettings defaultSettings;
