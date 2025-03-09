@@ -34,20 +34,20 @@ public class TestMgClient {
 		
 		mail.setSubject("Sign-Up email confirmation");
 		
-		mail.HTML_setWrapperStyle(".mg-mail-wrapper", null);
-		mail.HTML_appendBaseElement("div", 
+		mail.html_setWrapperStyle(".mg-mail-wrapper", null);
+		mail.html_appendBaseElement("div", 
 				".mg-mail-banner", 
 				"background-image: url(https://alphaventor.com/assets/logos/AlphaventorLogo-1024px-black-text.png);", 
 				null);
 		
-		mail.HTML_appendBaseElement("h1", ".mg-h1", null, "Hello dear AlphaVentor user!");
-		mail.HTML_appendBaseElement("h2", ".mg-h2", null, "Welcome to a world of designs");
-		mail.HTML_appendBaseElement("p", ".mg-p", null, 
+		mail.html_appendBaseElement("h1", ".mg-h1", null, "Hello dear AlphaVentor user!");
+		mail.html_appendBaseElement("h2", ".mg-h2", null, "Welcome to a world of designs");
+		mail.html_appendBaseElement("p", ".mg-p", null, 
 				"Please find below your validation code for the creation of your account:");
 		
-		mail.HTML_appendBaseElement("div", ".mg-code-wrapper", null, "IUOEN");
+		mail.html_appendBaseElement("div", ".mg-code-wrapper", null, "IUOEN");
 		
-		mail.HTML_appendBaseElement("p", ".mg-p", null, 
+		mail.html_appendBaseElement("p", ".mg-p", null, 
 				"If you're not the initiator of this, please report to pierre.convert@alphaventor.com");
 		
 		

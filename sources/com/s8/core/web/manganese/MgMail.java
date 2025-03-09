@@ -79,13 +79,13 @@ public class MgMail implements S8MailBuilder {
 
 
 	@Override
-	public void HTML_setWrapperStyle(String CSS_classname, String CSS_style) {
+	public void html_setWrapperStyle(String CSS_classname, String CSS_style) {
 		html_generator.setWrapperStyle(CSS_classname, CSS_style);
 	}
 
 
 	@Override
-	public void HTML_appendBaseElement(String tag, 
+	public void html_appendBaseElement(String tag, 
 			String CSS_classname, 
 			String CSS_style, 
 			String innerHTMLText) {
